@@ -1,0 +1,11 @@
+[package]
+
+name = "scenegraph"
+version = "0.1.0"
+authors = [
+    "Dzmitry Malyshau <kvarkus@gmail.com>",
+]
+
+[[lib]]
+name = "scenegraph"
+path = "src/lib.rs"
