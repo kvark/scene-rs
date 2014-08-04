@@ -1,0 +1,17 @@
+[package]
+
+name = "asteroids"
+version = "0.1.0"
+authors = [
+	"Dzmitry Malyshau <kvarkus@gmail.com>",
+]
+
+[[bin]]
+name = "asteroids"
+path = "main.rs"
+
+[dependencies.cgmath]
+git = "https://github.com/bjz/cgmath-rs.git"
+
+[dependencies.gfx]
+git = "https://github.com/gfx-rs/gfx-rs.git"
