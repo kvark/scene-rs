@@ -10,8 +10,14 @@ authors = [
 name = "asteroids"
 path = "main.rs"
 
+[dependencies.scenegraph]
+path = "../../.."
+
 [dependencies.cgmath]
 git = "https://github.com/bjz/cgmath-rs.git"
 
 [dependencies.gfx]
 git = "https://github.com/gfx-rs/gfx-rs.git"
+
+[dependencies.gl-init-rs]
+git = "https://github.com/tomaka/gl-init-rs.git"
