@@ -14,10 +14,13 @@ path = "main.rs"
 path = "../../.."
 
 [dependencies.cgmath]
-git = "https://github.com/bjz/cgmath-rs.git"
+git = "https://github.com/bjz/cgmath-rs"
 
 [dependencies.gfx]
-git = "https://github.com/gfx-rs/gfx-rs.git"
+git = "https://github.com/gfx-rs/gfx-rs"
+
+[dependencies.gl_init_platform]
+git = "http://github.com/gfx-rs/gfx-rs"
 
 [dependencies.gl-init-rs]
-git = "https://github.com/tomaka/gl-init-rs.git"
+git = "https://github.com/tomaka/gl-init-rs"

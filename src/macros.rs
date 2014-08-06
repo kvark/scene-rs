@@ -5,7 +5,7 @@ macro_rules! world {
         pub struct Id<S>(uint);
         pub type EntityId = uint;
 
-        trait System<T> {
+        pub trait System<T> {
             fn add_component(&mut self, T) -> Id<T>;
             fn get_component(&self, id: Id<T>) -> &T;
             fn mut_component(&mut self, id: Id<T>) -> &mut T;
@@ -27,7 +27,7 @@ macro_rules! world {
         }
 
         /// A collection of pointers to components
-        struct Entity<T> {
+        pub struct Entity<T> {
             user_data: T,
             $(
                 pub $name: Option<Id<$component>>,
@@ -72,7 +72,7 @@ macro_rules! world {
                     let id = self.entity.$name.unwrap();
                     self.hub.$name.get_component(id)
                 }
-            )*            
+            )*
         }
         /// Component change() wrapper
         pub struct Changer<'a, T> {
@@ -88,7 +88,7 @@ macro_rules! world {
                     let id = self.entity.$name.unwrap();
                     self.hub.$name.mut_component(id)
                 }
-            )*             
+            )*
         }
         /// World implementation
         impl<T> World<T> {
@@ -105,7 +105,7 @@ macro_rules! world {
                     user_data: data,
                     $(
                         $name: None,
-                    )*      
+                    )*
                 });
                 self.entities.len() - 1
             }
@@ -133,8 +133,8 @@ macro_rules! world {
 
 #[cfg(test)]
 pub mod test {
-    pub type DummyComponent = int;
-    pub type DummySystem = Vec<DummyComponent>;
+    type DummyComponent = int;
+    type DummySystem = Vec<DummyComponent>;
 
     world! {
         dummy : DummySystem[DummyComponent],

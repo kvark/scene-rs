@@ -11,6 +11,9 @@ extern crate native;
 #[phase(plugin)]
 extern crate scenegraph;
 
+use cgmath::point::Point2;
+use cgmath::vector::Vector2;
+
 #[vertex_format]
 struct Vertex {
     pos: [f32, ..2],
@@ -39,15 +42,21 @@ struct Drawable {
     slice: gfx::Slice,
 }
 
-type DrawSystem = Vec<Drawable>;
+struct Spatial {
+    pos: Point2<f32>,
+    speed: Vector2<f32>,
+}
+
 
 mod sg {
     world! {
-        draw: DrawSystem[Drawable],
+        draw: Vec<super::Drawable> [ super::Drawable ],
+        space: Vec<super::Spatial> [ super::Spatial ],
     }
 }
 
 struct Game {
+    world: sg::World<()>,
     program: Program,
     meshes: Vec<gfx::Mesh>,
     states: Vec<gfx::DrawState>,
@@ -86,13 +95,14 @@ impl Game {
             color: [1.0, ..4],
         };
         Game {
-            program: renderer.connect_program(program, params),
+            world: sg::World::new(Vec::new(), Vec::new()),
+            program: renderer.connect_program(program, params).unwrap(),
             meshes: Vec::new(),
             states: Vec::new(),
         }
     }
 
-    fn render(renderer: &mut gfx::Renderer) {
+    fn render(&mut self, renderer: &mut gfx::Renderer) {
         //empty
     }
 }
