@@ -1,4 +1,21 @@
 #[macro_export]
+macro_rules! derive_system {
+    ($system:ty . $field:ident [ $component:ty ]) => {
+        impl System<$component> for $system {
+            fn add_component(&mut self, c: $component) -> Id<$component> {
+                self.$field.add_component(c)
+            }
+            fn get_component(&self, id: Id<$component>) -> &$component {
+                self.$field.get_component(id)
+            }
+            fn mut_component(&mut self, id: Id<$component>) -> &mut $component {
+                self.$field.mut_component(id)
+            }
+        }
+    }
+}
+
+#[macro_export]
 macro_rules! world {
     ($($name:ident : $system:ty [ $component:ty ],)*) => {
         #[deriving(Clone, PartialEq, Show)]
@@ -7,8 +24,8 @@ macro_rules! world {
 
         pub trait System<T> {
             fn add_component(&mut self, T) -> Id<T>;
-            fn get_component(&self, id: Id<T>) -> &T;
-            fn mut_component(&mut self, id: Id<T>) -> &mut T;
+            fn get_component(&self, Id<T>) -> &T;
+            fn mut_component(&mut self, Id<T>) -> &mut T;
         }
 
         impl<T> System<T> for Vec<T> {
@@ -28,6 +45,7 @@ macro_rules! world {
 
         /// A collection of pointers to components
         pub struct Entity<T> {
+            #[allow(dead_code)]
             user_data: T,
             $(
                 pub $name: Option<Id<$component>>,
@@ -45,10 +63,12 @@ macro_rules! world {
             pub systems: SystemHub,
         }
         /// Component add() wrapper
+        #[allow(dead_code)]
         pub struct Adder<'a, T> {
             entity: &'a mut Entity<T>,
             hub: &'a mut SystemHub,
         }
+        #[allow(dead_code)]
         impl<'a, T> Adder<'a, T> {
             $(
                 pub fn $name(&mut self, value: $component) {
@@ -59,10 +79,12 @@ macro_rules! world {
             )*
         }
         /// Component get() wrapper
+        #[allow(dead_code)]
         pub struct Getter<'a, T> {
             entity: &'a Entity<T>,
             hub: &'a SystemHub,
         }
+        #[allow(dead_code)]
         impl<'a, T> Getter<'a, T> {
             pub fn user_data(&self) -> &T {
                 &self.entity.user_data
@@ -75,10 +97,12 @@ macro_rules! world {
             )*
         }
         /// Component change() wrapper
+        #[allow(dead_code)]
         pub struct Changer<'a, T> {
             entity: &'a mut Entity<T>,
             hub: &'a mut SystemHub,
         }
+        #[allow(dead_code)]
         impl <'a, T> Changer<'a, T> {
             pub fn user_data(&mut self) -> &mut T {
                 &mut self.entity.user_data
@@ -91,6 +115,7 @@ macro_rules! world {
             )*
         }
         /// World implementation
+        #[allow(dead_code)]
         impl<T> World<T> {
             pub fn new($($name : $system),*) -> World<T> {
                 World {

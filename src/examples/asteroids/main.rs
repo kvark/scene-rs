@@ -33,7 +33,10 @@ struct ShaderParam {
     color: [f32, ..4],
 }
 
-type Program = gfx::shade::CustomShell<_ShaderParamLink, ShaderParam>;
+enum Resource<T> {
+    New(T),
+    Existing(uint),
+}
 
 struct Drawable {
     program: Program,
@@ -47,26 +50,82 @@ struct Spatial {
     speed: Vector2<f32>,
 }
 
-
-mod sg {
-    world! {
-        draw: Vec<super::Drawable> [ super::Drawable ],
-        space: Vec<super::Spatial> [ super::Spatial ],
-    }
-}
-
-struct Game {
-    world: sg::World<()>,
+struct DrawSystem {
+    data: Vec<Drawable>,
+    frame: gfx::Frame,
     program: Program,
     meshes: Vec<gfx::Mesh>,
     states: Vec<gfx::DrawState>,
 }
 
+impl DrawSystem {
+    fn new(frame: gfx::Frame, program: Program) -> DrawSystem {
+        DrawSystem {
+            data: Vec::new(),
+            frame: frame,
+            program: program,
+            meshes: Vec::new(),
+            states: Vec::new(),
+        }
+    }
+
+    fn produce(&mut self, mesh: Resource<gfx::Mesh>,
+               state: Resource<gfx::DrawState>, slice: gfx::Slice) -> Drawable {
+        Drawable {
+            program: self.program,
+            mesh_id: match mesh {
+                New(data) => {
+                    self.meshes.push(data);
+                    self.meshes.len() - 1
+                },
+                Existing(id) => id,
+            },
+            state_id: match state {
+                New(data) => {
+                    self.states.push(data);
+                    self.states.len() - 1
+                },
+                Existing(id) => id,
+            },
+            slice: slice,
+        }
+    }
+
+    fn render(&self, renderer: &mut gfx::Renderer) {
+        let clear_data = gfx::ClearData {
+            color: Some(gfx::Color([0.3, 0.3, 0.3, 1.0])),
+            depth: None,
+            stencil: None,
+        };
+        renderer.clear(clear_data, self.frame);
+        for drawable in self.data.iter() {
+            let mesh = &self.meshes[drawable.mesh_id];
+            let state = &self.states[drawable.state_id];
+            renderer.draw(mesh, drawable.slice, &self.frame,
+                &drawable.program, state).unwrap();
+        }
+    }
+}
+
+mod sg {
+    world! {
+        draw: super::DrawSystem [ super::Drawable ],
+        space: Vec<super::Spatial> [ super::Spatial ],
+    }
+    derive_system! { super::DrawSystem . data [ super::Drawable ]}
+}
+
+struct Game {
+    world: sg::World<()>,
+    ship: sg::EntityId,
+}
+
 impl Game {
-    fn new(renderer: &mut gfx::Renderer) -> Game {
-        let program = renderer.create_program(
+    fn new(frame: gfx::Frame, renderer: &mut gfx::Renderer) -> Game {
+        // create draw system
+        let prog_handle = renderer.create_program(
             shaders! {
-                GLSL_150: b"
+            GLSL_150: b"
                 #version 150 core
                 in vec2 pos;
                 uniform vec4 offset_and_scale;
@@ -85,25 +144,40 @@ impl Game {
                 }
             "}
         );
-        let ship_mesh = renderer.create_mesh(vec![
-            Vertex::new(-0.5, -0.5),
-            Vertex::new(0.5, -0.5),
-            Vertex::new(0.0, 0.5),
-        ]);
-        let params = ShaderParam {
-            offset_and_scale: [0.0, 0.0, 0.01, 0.01],
-            color: [1.0, ..4],
+        let program = renderer.connect_program(
+            prog_handle,
+            ShaderParam {
+                offset_and_scale: [0.0, 0.0, 0.01, 0.01],
+                color: [1.0, ..4],
+            }
+        ).unwrap();
+        // populate entities
+        let mut world = sg::World::new(
+            DrawSystem::new(frame, program),
+            Vec::new()
+        );
+        let ship = {
+            let mesh = renderer.create_mesh(vec![
+                Vertex::new(-0.5, -0.5),
+                Vertex::new(0.5, -0.5),
+                Vertex::new(0.0, 0.5),
+            ]);
+            let slice = mesh.get_slice();
+            let state = gfx::DrawState::new();
+            let draw = world.systems.draw.produce(New(mesh), New(state), slice);
+            let entity = world.extend(());
+            world.add(entity).draw(draw);
+            entity
         };
+        // done
         Game {
-            world: sg::World::new(Vec::new(), Vec::new()),
-            program: renderer.connect_program(program, params).unwrap(),
-            meshes: Vec::new(),
-            states: Vec::new(),
+            world: world,
+            ship: ship,
         }
     }
 
     fn render(&mut self, renderer: &mut gfx::Renderer) {
-        //empty
+        self.world.systems.draw.render(renderer);
     }
 }
 
@@ -140,14 +214,8 @@ fn main() {
 
 fn render(mut renderer: gfx::Renderer, width: u16, height: u16) {
     let frame = gfx::Frame::new(width, height);
-    let clear_data = gfx::ClearData {
-        color: Some(gfx::Color([0.3, 0.3, 0.3, 1.0])),
-        depth: None,
-        stencil: None,
-    };
-    let mut game = Game::new(&mut renderer);
+    let mut game = Game::new(frame, &mut renderer);
     while !renderer.should_finish() {
-        renderer.clear(clear_data, frame);
         game.render(&mut renderer);
         renderer.end_frame();
         for err in renderer.errors() {
