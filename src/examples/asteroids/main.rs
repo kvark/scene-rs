@@ -8,11 +8,12 @@ extern crate gl_init_platform;
 extern crate glinit = "gl-init-rs";
 extern crate cgmath;
 extern crate native;
-#[phase(plugin)]
+#[phase(plugin, link)]
 extern crate scenegraph;
 
 use cgmath::point::Point2;
 use cgmath::vector::Vector2;
+use scenegraph::{Array, Id};
 
 #[vertex_format]
 struct Vertex {
@@ -33,91 +34,61 @@ struct ShaderParam {
     color: [f32, ..4],
 }
 
-enum Resource<T> {
-    New(T),
-    Existing(uint),
-}
-
-struct Drawable {
+pub struct Drawable {
     program: Program,
-    mesh_id: uint,
-    state_id: uint,
+    mesh_id: Id<gfx::Mesh>,
+    state_id: Id<gfx::DrawState>,
     slice: gfx::Slice,
 }
 
-struct Spatial {
+pub struct Spatial {
     pos: Point2<f32>,
     speed: Vector2<f32>,
 }
 
 struct DrawSystem {
-    data: Vec<Drawable>,
     frame: gfx::Frame,
     program: Program,
-    meshes: Vec<gfx::Mesh>,
-    states: Vec<gfx::DrawState>,
+    pub meshes: Array<gfx::Mesh>,
+    pub states: Array<gfx::DrawState>,
 }
 
 impl DrawSystem {
     fn new(frame: gfx::Frame, program: Program) -> DrawSystem {
         DrawSystem {
-            data: Vec::new(),
             frame: frame,
             program: program,
-            meshes: Vec::new(),
-            states: Vec::new(),
+            meshes: Array::new(),
+            states: Array::new(),
         }
     }
 
-    fn produce(&mut self, mesh: Resource<gfx::Mesh>,
-               state: Resource<gfx::DrawState>, slice: gfx::Slice) -> Drawable {
-        Drawable {
-            program: self.program,
-            mesh_id: match mesh {
-                New(data) => {
-                    self.meshes.push(data);
-                    self.meshes.len() - 1
-                },
-                Existing(id) => id,
-            },
-            state_id: match state {
-                New(data) => {
-                    self.states.push(data);
-                    self.states.len() - 1
-                },
-                Existing(id) => id,
-            },
-            slice: slice,
-        }
-    }
-
-    fn render(&self, renderer: &mut gfx::Renderer) {
+    fn render(&self, renderer: &mut gfx::Renderer, hub: &DataHub) {
         let clear_data = gfx::ClearData {
-            color: Some(gfx::Color([0.3, 0.3, 0.3, 1.0])),
+            color: Some(gfx::Color([0.1, 0.1, 0.1, 0.0])),
             depth: None,
             stencil: None,
         };
         renderer.clear(clear_data, self.frame);
-        for drawable in self.data.iter() {
-            let mesh = &self.meshes[drawable.mesh_id];
-            let state = &self.states[drawable.state_id];
+        for drawable in hub.draw.iter() {
+            let mesh = self.meshes.get(drawable.mesh_id);
+            let state = self.states.get(drawable.state_id);
             renderer.draw(mesh, drawable.slice, &self.frame,
                 &drawable.program, state).unwrap();
         }
     }
 }
 
-mod sg {
-    world! {
-        draw: super::DrawSystem [ super::Drawable ],
-        space: Vec<super::Spatial> [ super::Spatial ],
-    }
-    derive_system! { super::DrawSystem . data [ super::Drawable ]}
+entity! { scenegraph
+    draw: Drawable,
+    space: Spatial,
 }
 
 struct Game {
-    world: sg::World<()>,
-    ship: sg::EntityId,
+    entities: Array<Entity>,
+    hub: DataHub,
+    draw: DrawSystem,
+    ship_id: Id<Entity>,
 }
 
 impl Game {
@@ -125,9 +96,9 @@ impl Game {
         // create draw system
         let prog_handle = renderer.create_program(
             shaders! {
-            GLSL_150: b"
-                #version 150 core
-                in vec2 pos;
+            GLSL_120: b"
+                #version 120
+                attribute vec2 pos;
                 uniform vec4 offset_and_scale;
                 void main() {
                     gl_Position = vec4((offset_and_scale.xy + pos) *
@@ -135,27 +106,25 @@ impl Game {
                 }
             "},
             shaders! {
-            GLSL_150: b"
-                #version 150 core
-                out vec4 o_Color;
+            GLSL_120: b"
+                #version 120
                 uniform vec4 color;
                 void main() {
-                    o_Color = color;
+                    gl_FragColor = color;
                 }
             "}
         );
         let program = renderer.connect_program(
             prog_handle,
             ShaderParam {
-                offset_and_scale: [0.0, 0.0, 0.01, 0.01],
+                offset_and_scale: [0.0, 0.0, 0.1, 0.1],
                 color: [1.0, ..4],
             }
         ).unwrap();
         // populate entities
-        let mut world = sg::World::new(
-            DrawSystem::new(frame, program),
-            Vec::new()
-        );
+        let mut entities = Array::new();
+        let mut hub = DataHub::new();
+        let mut draw_system = DrawSystem::new(frame, program);
         let ship = {
             let mesh = renderer.create_mesh(vec![
                 Vertex::new(-0.5, -0.5),
@@ -163,21 +132,33 @@ impl Game {
                 Vertex::new(0.0, 0.5),
             ]);
             let slice = mesh.get_slice();
-            let state = gfx::DrawState::new();
-            let draw = world.systems.draw.produce(New(mesh), New(state), slice);
-            let entity = world.extend(());
-            world.add(entity).draw(draw);
-            entity
+            let mut state = gfx::DrawState::new();
+            state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
+            //let draw = draw_system.produce(New(mesh), New(state), slice);
+            let mesh_id = draw_system.meshes.add(mesh);
+            let state_id = draw_system.states.add(state);
+            Entity {
+                draw: Some(hub.draw.add(Drawable {
+                    program: program,
+                    mesh_id: mesh_id,
+                    state_id: state_id,
+                    slice: slice,
+                })),
+                space: None,
+            }
         };
+        let ship_id = entities.add(ship);
         // done
         Game {
-            world: world,
-            ship: ship,
+            entities: entities,
+            hub: hub,
+            draw: draw_system,
+            ship_id: ship_id,
         }
     }
 
     fn render(&mut self, renderer: &mut gfx::Renderer) {
-        self.world.systems.draw.render(renderer);
+        self.draw.render(renderer, &self.hub);
     }
 }
 
