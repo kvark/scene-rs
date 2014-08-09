@@ -1,12 +1,11 @@
 extern crate time;
 
-use cgmath::angle::{Angle, Rad};
-use cgmath::rotation::{Basis2, Rotation, Rotation2};
-use cgmath::point::{Point, Point2};
-use cgmath::vector::{Vector, Vector2};
+use cgmath::angle::Rad;
+use cgmath::point::{Point2};
+use cgmath::vector::{Vector2};
 use glinit;
 use gfx;
-use scenegraph::{Array, Id};
+use scenegraph::Array;
 use w = world;
 
 #[vertex_format]
@@ -27,7 +26,7 @@ pub struct Game {
 	hub: w::DataHub,
 	draw: w::DrawSystem,
 	inertia: w::InertiaSystem,
-	ship_id: Id<w::Entity>,
+	control: w::ControlSystem,
 	last_time: u64,
 }
 
@@ -94,50 +93,35 @@ impl Game {
 					velocity: Vector2::zero(),
 					angular_velocity: Rad{ s:0.0 },
 				})
+				.control(w::Control {
+					thrust_scale: 4.0,
+					rotate_scale: -90.0,
+				})
 				.entity
 		};
-		let ship_id = entities.add(ship);
+		entities.add(ship);
 		// done
 		Game {
 			entities: entities,
 			hub: hub,
 			draw: draw_system,
 			inertia: w::InertiaSystem,
-			ship_id: ship_id,
+			control: w::ControlSystem {
+				thrust: 0.0,
+				rotate: 0.0,
+			},
 			last_time: time::precise_time_ns(),
 		}
 	}
 
-	fn ship_impulse(&mut self, value: f32) {
-		let speed_scale = 0.2f32;
-		let ent = self.entities.get(self.ship_id);
-		match (ent.space, ent.inertia) {
-			(Some(s_id), Some(i_id)) => {
-				let s = self.hub.space.get(s_id);
-				let i = self.hub.inertia.get_mut(i_id);
-				let rot: Basis2<f32> = Rotation2::from_angle(s.orient);
-				let dir = rot.rotate_vector(&Vector2::unit_y());
-				i.velocity.add_self_v(&dir.mul_s(speed_scale * value));
-			},
-			(_, _) => (),
-		}
-	}
-
-	fn ship_orient(&mut self, dir: f32) {
-		let orient_scale = -1.5f32;
-		self.entities.get(self.ship_id).inertia.map(|i_id| {
-			let al = Rad{ s: orient_scale * dir };
-			self.hub.inertia.get_mut(i_id).angular_velocity = al;
-		});
-	}
-
 	pub fn on_event(&mut self, event: glinit::Event) {
 		match event {
-			glinit::Pressed(glinit::A) => self.ship_impulse(1.0),
-			glinit::Pressed(glinit::Left) => self.ship_orient(-1.0),
-			glinit::Pressed(glinit::Right) => self.ship_orient(1.0),
+			glinit::Pressed(glinit::A) => self.control.thrust = 1.0,
+			glinit::Released(glinit::A) => self.control.thrust = 0.0,
+			glinit::Pressed(glinit::Left) => self.control.rotate = -1.0,
+			glinit::Pressed(glinit::Right) => self.control.rotate = 1.0,
 			glinit::Released(glinit::Left) | glinit::Released(glinit::Right) =>
-				self.ship_orient(0.0),
+				self.control.rotate = 0.0,
 			_ => (),
 		}
 	}
@@ -151,6 +135,7 @@ impl Game {
 		let delta = (new_time - self.last_time) as f32 / 1e9;
 		self.last_time = new_time;
 
+		self.control.process(delta, &mut self.hub, self.entities.iter());
 		self.inertia.process(delta, &mut self.hub, self.entities.iter());
 		self.draw.process(renderer, &mut self.hub, self.entities.iter());
 	}

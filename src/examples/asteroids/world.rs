@@ -36,12 +36,18 @@ pub struct Inertial {
 	pub angular_velocity: Rad<f32>,
 }
 
+pub struct Control {
+	pub thrust_scale: f32,
+	pub rotate_scale: f32,
+}
+
 /// --- Entity ---
 
 entity! { es
 	draw: Drawable,
 	space: Spatial,
 	inertia: Inertial,
+	control: Control,
 }
 
 /// --- Systems ---
@@ -90,7 +96,6 @@ impl DrawSystem {
 }
 
 pub struct InertiaSystem;
-
 impl InertiaSystem {
 	pub fn process(&mut self, delta: f32, hub: &mut DataHub, mut en_iter: slice::Items<Entity>) {
 		for ent in en_iter {
@@ -103,6 +108,37 @@ impl InertiaSystem {
 					s.orient.add_self_a(i.angular_velocity.mul_s(delta));
 				});
 			});
+		}
+	}
+}
+
+pub struct ControlSystem {
+	pub thrust: f32,
+	pub rotate: f32,
+}
+
+impl ControlSystem {
+	pub fn process(&mut self, delta: f32, hub: &mut DataHub, mut en_iter: slice::Items<Entity>) {
+		for ent in en_iter {
+			match (ent.control, ent.inertia) {
+				(Some(c_id), Some(i_id)) => {
+					let c = hub.control.get(c_id);
+					let i = hub.inertia.get_mut(i_id);
+					let rotate = delta * c.rotate_scale * self.rotate;
+					i.angular_velocity = Rad{ s: rotate };
+					match ent.space {
+						Some(s_id) => {
+							let s = hub.space.get_mut(s_id);
+							let rot: Basis2<f32> = Rotation2::from_angle(s.orient);
+							let dir = rot.rotate_vector(&Vector2::unit_y());
+							let thrust = delta * c.thrust_scale * self.thrust;
+							i.velocity.add_self_v(&dir.mul_s(thrust));
+						},
+						None => (),
+					}
+				},
+				(_, _) => (),
+			}
 		}
 	}
 }
