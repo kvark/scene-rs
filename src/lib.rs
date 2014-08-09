@@ -32,7 +32,7 @@ impl<T> Array<T> {
 		&a[i as uint]
 	}
 
-	pub fn change(&mut self, Id(i): Id<T>) -> &mut T {
+	pub fn get_mut(&mut self, Id(i): Id<T>) -> &mut T {
 		let Array(ref mut a) = *self;
 		a.get_mut(i as uint)
 	}

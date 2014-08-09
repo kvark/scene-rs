@@ -11,7 +11,6 @@ entity! { scenegraph
 
 fn main() {
 	let mut hub = DataHub::new();
-	let mut ent = Entity::new();
-	hub.add(&mut ent).simple(4);
-	println!("{}", hub.get(&ent).simple());
+	let ent = hub.add().simple(4).entity;
+	println!("{}", hub.simple().get(ent.simple.unwrap()));
 }

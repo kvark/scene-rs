@@ -25,46 +25,17 @@ macro_rules! entity {
         }
 
         /// Component add_to() wrapper
-        pub struct Adder<'e, 'd> {
-            entity: &'e mut Entity,
+        pub struct Adder<'d> {
+            pub entity: Entity,
             hub: &'d mut DataHub,
         }
-        impl<'e, 'd> Adder<'e, 'd> {
+        impl<'d> Adder<'d> {
             $(
-            pub fn $name(self, value: $component) -> Adder<'e, 'd> {
+            pub fn $name(mut self, value: $component) -> Adder<'d> {
                 debug_assert!(self.entity.$name.is_none());
                 let id = self.hub.$name.add(value);
                 self.entity.$name = Some(id);
                 self
-            }
-            )*
-        }
-        /// Component get() wrapper
-        pub struct Getter<'e, 'd> {
-            entity: &'e Entity,
-            hub: &'d DataHub,
-        }
-        impl<'e, 'd> Getter<'e, 'd> {
-            $(
-            pub fn $name(&'d self) -> Option<&'d $component> {
-                self.entity.$name.map(|id| self.hub.$name.get(id))
-            }
-            )*
-        }
-        /// Component change() wrapper
-        pub struct Changer<'e, 'd> {
-            entity: &'e Entity,
-            hub: &'d mut DataHub,
-        }
-        impl<'e, 'd> Changer<'e, 'd> {
-            $(
-            pub fn $name(&'d mut self) -> Option<&'d mut $component> {
-                //Rust issue #16339
-                //self.entity.$name.map(|id| self.hub.$name.change(id))
-                match self.entity.$name {
-                    Some(id) => Some(self.hub.$name.change(id)),
-                    None => None,
-                }
             }
             )*
         }
@@ -78,14 +49,8 @@ macro_rules! entity {
                 )*
                 }
             }
-            pub fn add<'e, 'd>(&'d mut self, e: &'e mut Entity) -> Adder<'e, 'd> {
-                Adder {entity: e, hub: self,}
-            }
-            pub fn get<'e, 'd>(&'d self, e: &'e Entity) -> Getter<'e, 'd> {
-                Getter {entity: e, hub: self,}
-            }
-            pub fn change<'e, 'd>(&'d mut self, e: &'e Entity) -> Changer<'e, 'd> {
-                Changer {entity: e, hub: self,}
+            pub fn add<'d>(&'d mut self) -> Adder<'d> {
+                Adder {entity: Entity::new(), hub: self,}
             }
         }
     }
