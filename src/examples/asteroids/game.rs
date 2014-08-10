@@ -5,31 +5,35 @@ use cgmath::point::{Point2};
 use cgmath::vector::{Vector2};
 use glinit;
 use gfx;
-use w = world;
+use sys;
+use world;
 
 #[vertex_format]
 struct Vertex {
 	pos: [f32, ..2],
+	#[normalized]
+	color: [u8, ..4],
 }
 
 impl Vertex {
-	fn new(x: f32, y: f32) -> Vertex {
+	fn new(x: f32, y: f32, col: uint) -> Vertex {
 		Vertex {
-			pos: [x, y]
+			pos: [x, y],
+			color: [(col>>24) as u8, (col>>16) as u8, (col>>8) as u8, col as u8],
 		}
 	}
 }
 
 struct SystemHub {
-	draw: w::DrawSystem,
-	inertia: w::InertiaSystem,
-	control: w::ControlSystem,
-	bullet: w::BulletSystem,
+	draw: sys::draw::System,
+	inertia: sys::inertia::System,
+	control: sys::control::System,
+	bullet: sys::bullet::System,
 }
 
 pub struct Game {
-	entities: Vec<w::Entity>,
-	data: w::DataHub,
+	entities: Vec<world::Entity>,
+	data: world::DataHub,
 	systems: SystemHub,
 	last_time: u64,
 }
@@ -42,8 +46,11 @@ impl Game {
 			GLSL_120: b"
 				#version 120
 				attribute vec2 pos;
+				attribute vec4 color;
 				uniform vec4 transform, screen_scale;
+				varying vec4 v_color;
 				void main() {
+					v_color = color;
 					vec2 sc = vec2(sin(transform.z), cos(transform.z));
 					vec2 p = vec2(pos.x*sc.y - pos.y*sc.x, pos.x*sc.x + pos.y*sc.y);
 					p = (p * transform.w + transform.xy) * screen_scale.xy;
@@ -53,35 +60,32 @@ impl Game {
 			shaders! {
 			GLSL_120: b"
 				#version 120
-				uniform vec4 color;
+				varying vec4 v_color;
 				void main() {
-					gl_FragColor = color;
+					gl_FragColor = v_color;
 				}
 			"}
 		);
 		let program = renderer.connect_program(
 			prog_handle,
-			w::ShaderParam {
+			world::ShaderParam {
 				transform: [0.0, 0.0, 0.0, 1.0],
 				screen_scale: [0.1, 0.1, 0.0, 0.0],
-				color: [0.0, 0.7, 0.0, 1.0],
 			}
 		).unwrap();
 		// populate entities
 		let mut entities = Vec::new();
-		let mut data = w::DataHub::new();
-		let mut draw_system = w::DrawSystem::new(frame);
+		let mut data = world::DataHub::new();
+		let mut draw_system = sys::draw::System::new(frame);
 		let bullet_draw = {
-			let mut program = program;
-			program.data.color = [1.0, 0.5, 0.5, 1.0];
 			let mut mesh = renderer.create_mesh(vec![
-				Vertex::new(0.0, 0.0),
+				Vertex::new(0.0, 0.0, 0xFF404000),
 			]);
 			mesh.prim_type = gfx::Point;
 			let slice = mesh.get_slice();
 			let mut state = gfx::DrawState::new();
 			state.primitive.method = gfx::state::Point;
-			w::Drawable {
+			world::Drawable {
 				program: program,
 				mesh_id: draw_system.meshes.add(mesh),
 				state_id: draw_system.states.add(state),
@@ -90,30 +94,30 @@ impl Game {
 		};
 		let ship = {
 			let mesh = renderer.create_mesh(vec![
-				Vertex::new(-0.3, -0.5),
-				Vertex::new(0.3, -0.5),
-				Vertex::new(0.0, 0.5),
+				Vertex::new(-0.3, -0.5, 0x20C02000),
+				Vertex::new(0.3, -0.5,  0x20C02000),
+				Vertex::new(0.0, 0.5,   0x20C02000),
 			]);
 			let slice = mesh.get_slice();
 			let mut state = gfx::DrawState::new();
 			state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
 			data.add()
-				.draw(w::Drawable {
+				.draw(world::Drawable {
 					program: program,
 					mesh_id: draw_system.meshes.add(mesh),
 					state_id: draw_system.states.add(state),
 					slice: slice,
 				})
-				.space(w::Spatial {
+				.space(world::Spatial {
 					pos: Point2::new(0.0, 0.0),
 					orient: Rad{ s: 0.0 },
 					scale: 1.0,
 				})
-				.inertia(w::Inertial {
+				.inertia(world::Inertial {
 					velocity: Vector2::zero(),
 					angular_velocity: Rad{ s:0.0 },
 				})
-				.control(w::Control {
+				.control(world::Control {
 					thrust_scale: 4.0,
 					rotate_scale: -90.0,
 				})
@@ -127,9 +131,9 @@ impl Game {
 			data: data,
 			systems: SystemHub {
 				draw: draw_system,
-				inertia: w::InertiaSystem,
-				control: w::ControlSystem::new(),
-				bullet: w::BulletSystem::new(space_id, inertia_id, bullet_draw),
+				inertia: sys::inertia::System,
+				control: sys::control::System::new(),
+				bullet: sys::bullet::System::new(space_id, inertia_id, bullet_draw),
 			},
 			last_time: time::precise_time_ns(),
 		}

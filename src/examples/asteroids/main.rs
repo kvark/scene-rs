@@ -13,6 +13,12 @@ use std::comm;
 
 mod game;
 mod world;
+mod sys {
+    pub mod bullet;
+    pub mod control;
+    pub mod draw;
+    pub mod inertia;
+}
 
 fn main() {
     let builder = glinit::WindowBuilder::new()

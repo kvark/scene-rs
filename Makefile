@@ -1,4 +1,4 @@
-.PHONY: all lib examples update
+.PHONY: all lib examples update run
 
 all: lib examples
 
@@ -13,3 +13,6 @@ update:
 	cargo update
 	(cd src/examples/asteroids && cargo update)
 	(cd src/examples/simple && cargo update)
+
+run: examples
+	src/examples/asteroids/target/asteroids
