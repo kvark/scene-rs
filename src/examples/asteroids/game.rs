@@ -27,6 +27,7 @@ pub struct Game {
 	draw: w::DrawSystem,
 	inertia: w::InertiaSystem,
 	control: w::ControlSystem,
+	bullet: w::BulletSystem,
 	last_time: u64,
 }
 
@@ -42,7 +43,7 @@ impl Game {
 				void main() {
 					vec2 sc = vec2(sin(transform.z), cos(transform.z));
 					vec2 p = vec2(pos.x*sc.y - pos.y*sc.x, pos.x*sc.x + pos.y*sc.y);
-					p = (p + transform.xy) * screen_scale.xy;
+					p = (p * transform.w + transform.xy) * screen_scale.xy;
 					gl_Position = vec4(p, 0.0, 1.0);
 				}
 			"},
@@ -58,7 +59,7 @@ impl Game {
 		let program = renderer.connect_program(
 			prog_handle,
 			w::ShaderParam {
-				transform: [0.0, 0.0, 0.0, 0.0],
+				transform: [0.0, 0.0, 0.0, 1.0],
 				screen_scale: [0.1, 0.1, 0.0, 0.0],
 				color: [1.0, ..4],
 			}
@@ -66,7 +67,7 @@ impl Game {
 		// populate entities
 		let mut entities = Array::new();
 		let mut hub = w::DataHub::new();
-		let mut draw_system = w::DrawSystem::new(frame);
+		let mut draw_system = w::DrawSystem::new(frame, program);
 		let ship = {
 			let mesh = renderer.create_mesh(vec![
 				Vertex::new(-0.3, -0.5),
@@ -88,6 +89,7 @@ impl Game {
 				.space(w::Spatial {
 					pos: Point2::new(0.0, 0.0),
 					orient: Rad{ s: 0.0 },
+					scale: 1.0,
 				})
 				.inertia(w::Inertial {
 					velocity: Vector2::zero(),
@@ -99,7 +101,7 @@ impl Game {
 				})
 				.entity
 		};
-		entities.add(ship);
+		let ship_id = entities.add(ship);
 		// done
 		Game {
 			entities: entities,
@@ -110,6 +112,7 @@ impl Game {
 				thrust: 0.0,
 				rotate: 0.0,
 			},
+			bullet: w::BulletSystem::new(ship_id),
 			last_time: time::precise_time_ns(),
 		}
 	}
@@ -122,6 +125,8 @@ impl Game {
 			glinit::Pressed(glinit::Right) => self.control.rotate = 1.0,
 			glinit::Released(glinit::Left) | glinit::Released(glinit::Right) =>
 				self.control.rotate = 0.0,
+			glinit::Pressed(glinit::S) => self.bullet.shoot = true,
+			glinit::Released(glinit::S) => self.bullet.shoot = false,
 			_ => (),
 		}
 	}
@@ -137,6 +142,7 @@ impl Game {
 
 		self.control.process(delta, &mut self.hub, self.entities.iter());
 		self.inertia.process(delta, &mut self.hub, self.entities.iter());
+		self.bullet.process(delta, &mut self.hub, &mut self.entities);
 		self.draw.process(renderer, &mut self.hub, self.entities.iter());
 	}
 }
