@@ -2,6 +2,7 @@
 macro_rules! entity {
     ($space:ident $($name:ident : $component:ty,)*) => {
         /// A collection of pointers to components
+        #[deriving(Clone)]
         pub struct Entity {
             $(
             pub $name: Option<$space::Id<$component>>,

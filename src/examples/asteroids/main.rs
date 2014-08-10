@@ -41,12 +41,8 @@ fn main() {
                 _ => ev_send.send(event),
             }
         }
-
         device.update();
     }
-
-    device.update();
-    device.close();
 }
 
 fn render(mut renderer: gfx::Renderer, width: u16, height: u16,

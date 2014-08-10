@@ -5,7 +5,6 @@ use cgmath::point::{Point2};
 use cgmath::vector::{Vector2};
 use glinit;
 use gfx;
-use scenegraph::Array;
 use w = world;
 
 #[vertex_format]
@@ -21,13 +20,17 @@ impl Vertex {
 	}
 }
 
-pub struct Game {
-	entities: Array<w::Entity>,
-	hub: w::DataHub,
+struct SystemHub {
 	draw: w::DrawSystem,
 	inertia: w::InertiaSystem,
 	control: w::ControlSystem,
 	bullet: w::BulletSystem,
+}
+
+pub struct Game {
+	entities: Vec<w::Entity>,
+	data: w::DataHub,
+	systems: SystemHub,
 	last_time: u64,
 }
 
@@ -61,13 +64,30 @@ impl Game {
 			w::ShaderParam {
 				transform: [0.0, 0.0, 0.0, 1.0],
 				screen_scale: [0.1, 0.1, 0.0, 0.0],
-				color: [1.0, ..4],
+				color: [0.0, 0.7, 0.0, 1.0],
 			}
 		).unwrap();
 		// populate entities
-		let mut entities = Array::new();
-		let mut hub = w::DataHub::new();
-		let mut draw_system = w::DrawSystem::new(frame, program);
+		let mut entities = Vec::new();
+		let mut data = w::DataHub::new();
+		let mut draw_system = w::DrawSystem::new(frame);
+		let bullet_draw = {
+			let mut program = program;
+			program.data.color = [1.0, 0.5, 0.5, 1.0];
+			let mut mesh = renderer.create_mesh(vec![
+				Vertex::new(0.0, 0.0),
+			]);
+			mesh.prim_type = gfx::Point;
+			let slice = mesh.get_slice();
+			let mut state = gfx::DrawState::new();
+			state.primitive.method = gfx::state::Point;
+			w::Drawable {
+				program: program,
+				mesh_id: draw_system.meshes.add(mesh),
+				state_id: draw_system.states.add(state),
+				slice: slice,
+			}
+		};
 		let ship = {
 			let mesh = renderer.create_mesh(vec![
 				Vertex::new(-0.3, -0.5),
@@ -77,13 +97,11 @@ impl Game {
 			let slice = mesh.get_slice();
 			let mut state = gfx::DrawState::new();
 			state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
-			let mesh_id = draw_system.meshes.add(mesh);
-			let state_id = draw_system.states.add(state);
-			hub.add()
+			data.add()
 				.draw(w::Drawable {
 					program: program,
-					mesh_id: mesh_id,
-					state_id: state_id,
+					mesh_id: draw_system.meshes.add(mesh),
+					state_id: draw_system.states.add(state),
 					slice: slice,
 				})
 				.space(w::Spatial {
@@ -101,32 +119,32 @@ impl Game {
 				})
 				.entity
 		};
-		let ship_id = entities.add(ship);
+		let (space_id, inertia_id) = (ship.space.unwrap(), ship.inertia.unwrap());
+		entities.push(ship);
 		// done
 		Game {
 			entities: entities,
-			hub: hub,
-			draw: draw_system,
-			inertia: w::InertiaSystem,
-			control: w::ControlSystem {
-				thrust: 0.0,
-				rotate: 0.0,
+			data: data,
+			systems: SystemHub {
+				draw: draw_system,
+				inertia: w::InertiaSystem,
+				control: w::ControlSystem::new(),
+				bullet: w::BulletSystem::new(space_id, inertia_id, bullet_draw),
 			},
-			bullet: w::BulletSystem::new(ship_id),
 			last_time: time::precise_time_ns(),
 		}
 	}
 
 	pub fn on_event(&mut self, event: glinit::Event) {
 		match event {
-			glinit::Pressed(glinit::A) => self.control.thrust = 1.0,
-			glinit::Released(glinit::A) => self.control.thrust = 0.0,
-			glinit::Pressed(glinit::Left) => self.control.rotate = -1.0,
-			glinit::Pressed(glinit::Right) => self.control.rotate = 1.0,
+			glinit::Pressed(glinit::A) => self.systems.control.thrust = 1.0,
+			glinit::Released(glinit::A) => self.systems.control.thrust = 0.0,
+			glinit::Pressed(glinit::Left) => self.systems.control.rotate = -1.0,
+			glinit::Pressed(glinit::Right) => self.systems.control.rotate = 1.0,
 			glinit::Released(glinit::Left) | glinit::Released(glinit::Right) =>
-				self.control.rotate = 0.0,
-			glinit::Pressed(glinit::S) => self.bullet.shoot = true,
-			glinit::Released(glinit::S) => self.bullet.shoot = false,
+				self.systems.control.rotate = 0.0,
+			glinit::Pressed(glinit::S) => self.systems.bullet.shoot = true,
+			glinit::Released(glinit::S) => self.systems.bullet.shoot = false,
 			_ => (),
 		}
 	}
@@ -140,9 +158,9 @@ impl Game {
 		let delta = (new_time - self.last_time) as f32 / 1e9;
 		self.last_time = new_time;
 
-		self.control.process(delta, &mut self.hub, self.entities.iter());
-		self.inertia.process(delta, &mut self.hub, self.entities.iter());
-		self.bullet.process(delta, &mut self.hub, &mut self.entities);
-		self.draw.process(renderer, &mut self.hub, self.entities.iter());
+		self.systems.control.process(delta, &mut self.data, self.entities.as_slice());
+		self.systems.inertia.process(delta, &mut self.data, self.entities.as_slice());
+		self.systems.bullet .process(delta, &mut self.data, &mut self.entities);
+		self.systems.draw.process(renderer, &mut self.data, self.entities.as_slice());
 	}
 }

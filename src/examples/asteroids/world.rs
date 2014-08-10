@@ -1,7 +1,6 @@
 #[phase(plugin)]
 extern crate gfx_macros;
 
-use std::slice;
 use cgmath::angle::{Angle, Rad};
 use cgmath::rotation::{Basis2, Rotation, Rotation2};
 use cgmath::point::{Point, Point2};
@@ -26,6 +25,13 @@ pub struct Drawable {
 	pub slice: gfx::Slice,
 }
 
+impl Clone for Drawable {
+	fn clone(&self) -> Drawable {
+		*self
+	}
+}
+
+#[deriving(Clone)]
 pub struct Spatial {
 	pub pos: Point2<f32>,
 	pub orient: Rad<f32>,
@@ -39,16 +45,19 @@ impl Spatial {
 	}
 }
 
+#[deriving(Clone)]
 pub struct Inertial {
 	pub velocity: Vector2<f32>,
 	pub angular_velocity: Rad<f32>,
 }
 
+#[deriving(Clone)]
 pub struct Control {
 	pub thrust_scale: f32,
 	pub rotate_scale: f32,
 }
 
+#[deriving(Clone)]
 pub struct Bullet {
 	pub life_time: Option<f32>,
 }
@@ -66,16 +75,14 @@ entity! { es
 /// --- Systems ---
 
 pub struct DrawSystem {
-	program: Program,
 	frame: gfx::Frame,
 	pub meshes: es::Array<gfx::Mesh>,
 	pub states: es::Array<gfx::DrawState>,
 }
 
 impl DrawSystem {
-	pub fn new(frame: gfx::Frame, program: Program) -> DrawSystem {
+	pub fn new(frame: gfx::Frame) -> DrawSystem {
 		DrawSystem {
-			program: program,
 			frame: frame,
 			meshes: es::Array::new(),
 			states: es::Array::new(),
@@ -90,14 +97,14 @@ impl DrawSystem {
 	}
 
 	pub fn process<'a>(&self, renderer: &mut gfx::Renderer, hub: &mut DataHub,
-				mut en_iter: slice::Items<'a, Entity>) {
+				entities: &[Entity]) {
 		let clear_data = gfx::ClearData {
 			color: Some(gfx::Color([0.1, 0.1, 0.1, 0.0])),
 			depth: None,
 			stencil: None,
 		};
 		renderer.clear(clear_data, self.frame);
-		for ent in en_iter {
+		for ent in entities.iter() {
 			ent.draw.map(|d_id| {
 				let drawable = hub.draw.get_mut(d_id);
 				ent.space.map(|s_id| {
@@ -112,8 +119,8 @@ impl DrawSystem {
 
 pub struct InertiaSystem;
 impl InertiaSystem {
-	pub fn process(&mut self, delta: f32, hub: &mut DataHub, mut en_iter: slice::Items<Entity>) {
-		for ent in en_iter {
+	pub fn process(&mut self, delta: f32, hub: &mut DataHub, entities: &[Entity]) {
+		for ent in entities.iter() {
 			ent.space.map(|s_id| {
 				let s = hub.space.get_mut(s_id);
 				ent.inertia.map(|i_id| {
@@ -133,8 +140,14 @@ pub struct ControlSystem {
 }
 
 impl ControlSystem {
-	pub fn process(&mut self, delta: f32, hub: &mut DataHub, mut en_iter: slice::Items<Entity>) {
-		for ent in en_iter {
+	pub fn new() -> ControlSystem {
+		ControlSystem {
+			thrust: 0.0,
+			rotate: 0.0,
+		}
+	}
+	pub fn process(&mut self, delta: f32, hub: &mut DataHub, entities: &[Entity]) {
+		for ent in entities.iter() {
 			match (ent.control, ent.inertia) {
 				(Some(c_id), Some(i_id)) => {
 					let c = hub.control.get(c_id);
@@ -159,31 +172,36 @@ impl ControlSystem {
 
 pub struct BulletSystem {
 	pub shoot: bool,
-	ship_id: es::Id<Entity>,
+	ship_space_id: es::Id<Spatial>,
+	ship_inertia_id: es::Id<Inertial>,
+	draw: Drawable,
 	cool_time: f32,
-	pool: Vec<es::Id<Entity>>,
+	pool: Vec<Entity>,
 }
 
 impl BulletSystem {
-	pub fn new(ship_id: es::Id<Entity>) -> BulletSystem {
+	pub fn new(space_id: es::Id<Spatial>, inertia_id: es::Id<Inertial>, draw: Drawable) -> BulletSystem {
 		BulletSystem {
 			shoot: false,
-			ship_id: ship_id,
+			ship_space_id: space_id,
+			ship_inertia_id: inertia_id,
+			draw: draw,
 			cool_time: 1.0,
 			pool: Vec::new(),
 		}
 	}
 
-	pub fn process(&mut self, delta: f32, hub: &mut DataHub, entities: &mut es::Array<Entity>) {
+	pub fn process(&mut self, delta: f32, hub: &mut DataHub, entities: &mut Vec<Entity>) {
 		self.cool_time = if self.cool_time > delta {self.cool_time - delta} else {0.0};
-		if self.shoot {
+		if self.shoot && self.cool_time <= 0.0 {
+			self.cool_time = 0.2;
 			let velocity = 5.0f32;
 			let bullet = Bullet {
-				life_time: Some(5.0f32),
+				life_time: Some(1.0f32),
 			};
 			let (space, inertia) = {
-				let e_space = hub.space.get(entities.get(self.ship_id).space.unwrap());
-				let e_inertia = hub.inertia.get(entities.get(self.ship_id).inertia.unwrap());
+				let e_space = hub.space.get(self.ship_space_id);
+				let e_inertia = hub.inertia.get(self.ship_inertia_id);
 				(Spatial {
 					pos: e_space.pos,
 					orient: Rad{ s: 0.0 },
@@ -193,40 +211,44 @@ impl BulletSystem {
 					angular_velocity: Rad{ s: 0.0 },
 				})
 			};
-			let draw = *hub.draw.get(entities.get(self.ship_id).draw.unwrap());
-			match self.pool.pop() {
-				Some(e_id) => {
-					let ent = entities.get_mut(e_id);
+			let ent = match self.pool.pop() {
+				Some(ent) => {
 					*hub.bullet.get_mut(ent.bullet.unwrap()) = bullet;
 					*hub.space.get_mut(ent.space.unwrap()) = space;
 					*hub.inertia.get_mut(ent.inertia.unwrap()) = inertia;
+					ent
 				},
 				None => {
-					entities.add(hub.add()
+					hub.add()
 						.space(space)
 						.inertia(inertia)
-						.draw(draw)
+						.draw(self.draw)
 						.bullet(bullet)
 						.entity
-					);
 				},
-			}
+			};
+			entities.push(ent);
 		}
-		for ent in entities.mut_iter() {
+		let (new_entities, reserve) = entities.partitioned(|ent| {
 			match ent.bullet {
 				Some(b_id) => {
 					let bullet = hub.bullet.get_mut(b_id);
-					bullet.life_time = match bullet.life_time {
-						Some(t) if t>delta => Some(t-delta),
-						Some(t) => {
-							//self.pool.push();
-							None
+					match bullet.life_time {
+						Some(ref mut t) if *t>delta => {
+							*t -= delta;
+							true
 						},
-						None => None,
+						Some(_) => {
+							bullet.life_time = None;
+							false
+						},
+						None => true,
 					}
 				},
-				None => (),
+				None => true,
 			}
-		}
+		});
+		*entities = new_entities;
+		self.pool.push_all_move(reserve);
 	}
 }
