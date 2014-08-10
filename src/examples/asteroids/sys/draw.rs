@@ -1,19 +1,19 @@
 use gfx;
-use es = scenegraph;
+use scenegraph::ces;
 use w = world;
 
 pub struct System {
 	frame: gfx::Frame,
-	pub meshes: es::Array<gfx::Mesh>,
-	pub states: es::Array<gfx::DrawState>,
+	pub meshes: ces::Array<gfx::Mesh>,
+	pub states: ces::Array<gfx::DrawState>,
 }
 
 impl System {
 	pub fn new(frame: gfx::Frame) -> System {
 		System {
 			frame: frame,
-			meshes: es::Array::new(),
-			states: es::Array::new(),
+			meshes: ces::Array::new(),
+			states: ces::Array::new(),
 		}
 	}
 

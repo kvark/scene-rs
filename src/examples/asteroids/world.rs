@@ -6,7 +6,7 @@ use cgmath::rotation::{Basis2, Rotation, Rotation2};
 use cgmath::point::Point2;
 use cgmath::vector::Vector2;
 use gfx;
-use es = scenegraph;
+use scenegraph::ces;
 
 
 #[shader_param(Program)]
@@ -20,8 +20,8 @@ pub struct ShaderParam {
 
 pub struct Drawable {
 	pub program: Program,
-	pub mesh_id: es::Id<gfx::Mesh>,
-	pub state_id: es::Id<gfx::DrawState>,
+	pub mesh_id: ces::Id<gfx::Mesh>,
+	pub state_id: ces::Id<gfx::DrawState>,
 	pub slice: gfx::Slice,
 }
 
@@ -63,7 +63,7 @@ pub struct Bullet {
 }
 
 
-entity! { es
+entity! { ces
 	draw: Drawable,
 	space: Spatial,
 	inertia: Inertial,

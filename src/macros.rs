@@ -1,3 +1,5 @@
+#![macro_escape]
+
 #[macro_export]
 macro_rules! entity {
     ($space:ident $($name:ident : $component:ty,)*) => {
@@ -8,6 +10,7 @@ macro_rules! entity {
             pub $name: Option<$space::Id<$component>>,
             )*
         }
+
         impl Entity {
             pub fn new() -> Entity {
                 Entity {
@@ -41,7 +44,6 @@ macro_rules! entity {
             )*
         }
 
-        /// DataHub implementation
         impl DataHub {
             pub fn new() -> DataHub {
                 DataHub {
@@ -52,6 +54,33 @@ macro_rules! entity {
             }
             pub fn add<'d>(&'d mut self) -> Adder<'d> {
                 Adder {entity: Entity::new(), hub: self,}
+            }
+        }
+
+        /// A system responsible for some aspect (physics, rendering, etc)
+        pub trait System {
+            fn process(&mut self, &mut DataHub, &mut Vec<Entity>, delta: f32);
+        }
+
+        /// A top level union of entities, their data, and systems
+        pub struct World {
+            pub data: DataHub,
+            pub entities: Vec<Entity>,
+            pub systems: Vec<Box<System>>,
+        }
+
+        impl World {
+            pub fn new() -> World {
+                World {
+                    data: DataHub::new(),
+                    entities: Vec::new(),
+                    systems: Vec::new(),
+                }
+            }
+            pub fn update(&mut self, delta: f32) {
+                for sys in self.systems.mut_iter() {
+                    sys.process(&mut self.data, &mut self.entities, delta);
+                }
             }
         }
     }

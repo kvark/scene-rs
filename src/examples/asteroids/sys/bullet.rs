@@ -1,20 +1,21 @@
 use cgmath::angle::{Angle, Rad};
 use cgmath::point::Point;
 use cgmath::vector::Vector;
-use es = scenegraph;
+use scenegraph::ces;
 use w = world;
 
 pub struct System {
 	pub shoot: bool,
-	ship_space_id: es::Id<w::Spatial>,
-	ship_inertia_id: es::Id<w::Inertial>,
+	ship_space_id: ces::Id<w::Spatial>,
+	ship_inertia_id: ces::Id<w::Inertial>,
 	draw: w::Drawable,
 	cool_time: f32,
 	pool: Vec<w::Entity>,
 }
 
 impl System {
-	pub fn new(space_id: es::Id<w::Spatial>, inertia_id: es::Id<w::Inertial>, draw: w::Drawable) -> System {
+	pub fn new(space_id: ces::Id<w::Spatial>, inertia_id: ces::Id<w::Inertial>,
+			   draw: w::Drawable) -> System {
 		System {
 			shoot: false,
 			ship_space_id: space_id,
