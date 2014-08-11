@@ -54,7 +54,7 @@ fn render(mut renderer: gfx::Renderer, width: u16, height: u16,
     let frame = gfx::Frame::new(width, height);
     let mut game = game::Game::new(frame, ev_recv, &mut renderer);
     while !renderer.should_finish() {
-        renderer = game.render(renderer);
+        game.render(&mut renderer);
         renderer.end_frame();
         for err in renderer.errors() {
             println!("Renderer error: {}", err);

@@ -6,7 +6,7 @@ use w = world;
 pub struct System;
 
 impl w::System for System {
-	fn process(&mut self, (time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
+	fn process(&mut self, &(time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
 		for ent in entities.iter() {
 			ent.space.map(|s_id| {
 				let s = data.space.get_mut(s_id);

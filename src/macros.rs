@@ -78,9 +78,9 @@ macro_rules! world {
                 }
             }
             pub fn update(&mut self, param: $param) {
-                //for sys in self.systems.mut_iter() {
-                //    sys.process(param, &mut self.data, &mut self.entities);
-                //}
+                for sys in self.systems.mut_iter() {
+                    sys.process(param, &mut self.data, &mut self.entities);
+                }
             }
         }
     }

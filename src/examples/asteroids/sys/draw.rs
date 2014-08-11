@@ -25,7 +25,7 @@ impl System {
 }
 
 impl w::System for System {
-	fn process(&mut self, (_, renderer): w::Params, data: &mut w::Components,
+	fn process(&mut self, &(_, ref mut renderer): w::Params, data: &mut w::Components,
 	           entities: &mut Vec<w::Entity>) {
 		let clear_data = gfx::ClearData {
 			color: Some(gfx::Color([0.1, 0.1, 0.1, 0.0])),
@@ -40,7 +40,7 @@ impl w::System for System {
 					let s = data.space.get(s_id);
 					drawable.program.data.transform = [s.pos.x, s.pos.y, s.orient.s, s.scale];
 				});
-				self.render(renderer, drawable)
+				self.render(*renderer, drawable)
 			});
 		}
 	}

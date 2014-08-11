@@ -43,7 +43,7 @@ impl System {
 }
 
 impl w::System for System {
-	fn process(&mut self, (time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
+	fn process(&mut self, &(time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
 		self.check_input();
 		self.cool_time = if self.cool_time > time {self.cool_time - time} else {0.0};
 		if self.shoot && self.cool_time <= 0.0 {

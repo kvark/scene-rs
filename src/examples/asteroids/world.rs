@@ -9,7 +9,7 @@ use gfx;
 use scenegraph::ces;
 
 pub type Delta = f32;
-pub type Params<'a> = (Delta, &'a mut gfx::Renderer);
+pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::Renderer);
 
 #[shader_param(Program)]
 pub struct ShaderParam {
