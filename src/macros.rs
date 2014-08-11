@@ -1,8 +1,8 @@
 #![macro_escape]
 
 #[macro_export]
-macro_rules! entity {
-    ($space:ident $($name:ident : $component:ty,)*) => {
+macro_rules! world {
+    ($space:ident ($param:ty), $($name:ident : $component:ty,)*) => {
         /// A collection of pointers to components
         #[deriving(Clone)]
         pub struct Entity {
@@ -22,7 +22,7 @@ macro_rules! entity {
         }
 
         /// A collection of component arrays
-        pub struct DataHub {
+        pub struct Components {
             $(
             pub $name: $space::Array<$component>,
             )*
@@ -31,40 +31,40 @@ macro_rules! entity {
         /// Component add_to() wrapper
         pub struct Adder<'d> {
             pub entity: Entity,
-            hub: &'d mut DataHub,
+            data: &'d mut Components,
         }
         impl<'d> Adder<'d> {
             $(
             pub fn $name(mut self, value: $component) -> Adder<'d> {
                 debug_assert!(self.entity.$name.is_none());
-                let id = self.hub.$name.add(value);
+                let id = self.data.$name.add(value);
                 self.entity.$name = Some(id);
                 self
             }
             )*
         }
 
-        impl DataHub {
-            pub fn new() -> DataHub {
-                DataHub {
+        impl Components {
+            pub fn new() -> Components {
+                Components {
                 $(
                     $name: $space::Array::new(),
                 )*
                 }
             }
             pub fn add<'d>(&'d mut self) -> Adder<'d> {
-                Adder {entity: Entity::new(), hub: self,}
+                Adder {entity: Entity::new(), data: self,}
             }
         }
 
         /// A system responsible for some aspect (physics, rendering, etc)
         pub trait System {
-            fn process(&mut self, &mut DataHub, &mut Vec<Entity>, delta: f32);
+            fn process(&mut self, $param, &mut Components, &mut Vec<Entity>);
         }
 
         /// A top level union of entities, their data, and systems
         pub struct World {
-            pub data: DataHub,
+            pub data: Components,
             pub entities: Vec<Entity>,
             pub systems: Vec<Box<System>>,
         }
@@ -72,15 +72,15 @@ macro_rules! entity {
         impl World {
             pub fn new() -> World {
                 World {
-                    data: DataHub::new(),
+                    data: Components::new(),
                     entities: Vec::new(),
                     systems: Vec::new(),
                 }
             }
-            pub fn update(&mut self, delta: f32) {
-                for sys in self.systems.mut_iter() {
-                    sys.process(&mut self.data, &mut self.entities, delta);
-                }
+            pub fn update(&mut self, param: $param) {
+                //for sys in self.systems.mut_iter() {
+                //    sys.process(param, &mut self.data, &mut self.entities);
+                //}
             }
         }
     }

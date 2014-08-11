@@ -8,6 +8,8 @@ use cgmath::vector::Vector2;
 use gfx;
 use scenegraph::ces;
 
+pub type Delta = f32;
+pub type Params<'a> = (Delta, &'a mut gfx::Renderer);
 
 #[shader_param(Program)]
 pub struct ShaderParam {
@@ -53,8 +55,8 @@ pub struct Inertial {
 
 #[deriving(Clone)]
 pub struct Control {
-	pub thrust_scale: f32,
-	pub rotate_scale: f32,
+	pub thrust_speed: f32,
+	pub turn_speed: f32,
 }
 
 #[deriving(Clone)]
@@ -63,7 +65,7 @@ pub struct Bullet {
 }
 
 
-entity! { ces
+world! { ces (Params),
 	draw: Drawable,
 	space: Spatial,
 	inertia: Inertial,

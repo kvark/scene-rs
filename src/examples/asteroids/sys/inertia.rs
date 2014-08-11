@@ -5,16 +5,16 @@ use w = world;
 
 pub struct System;
 
-impl System {
-	pub fn process(&mut self, delta: f32, hub: &mut w::DataHub, entities: &[w::Entity]) {
+impl w::System for System {
+	fn process(&mut self, (time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
 		for ent in entities.iter() {
 			ent.space.map(|s_id| {
-				let s = hub.space.get_mut(s_id);
+				let s = data.space.get_mut(s_id);
 				ent.inertia.map(|i_id| {
-					let i = hub.inertia.get(i_id);
-					let move = i.velocity.mul_s(delta);
+					let i = data.inertia.get(i_id);
+					let move = i.velocity.mul_s(time);
 					s.pos.add_self_v(&move);
-					s.orient.add_self_a(i.angular_velocity.mul_s(delta));
+					s.orient.add_self_a(i.angular_velocity.mul_s(time));
 				});
 			});
 		}

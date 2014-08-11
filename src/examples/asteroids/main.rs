@@ -9,8 +9,6 @@ extern crate glinit = "gl-init-rs";
 #[phase(plugin, link)]
 extern crate scenegraph;
 
-use std::comm;
-
 mod game;
 mod world;
 mod sys {
@@ -29,7 +27,7 @@ fn main() {
         .unwrap();
     unsafe { window.make_current() };
     let (w, h) = window.get_inner_size().unwrap();
-    let (ev_send, ev_recv) = channel();
+    let (ev_send, ev_recv) = game::EventSender::new();
 
     let mut device = gfx::build()
         .with_context(&window)
@@ -44,7 +42,7 @@ fn main() {
             match event {
                 glinit::Pressed(glinit::Escape) => break 'main,
                 glinit::Closed => break 'main,
-                _ => ev_send.send(event),
+                _ => ev_send.process(event),
             }
         }
         device.update();
@@ -52,18 +50,11 @@ fn main() {
 }
 
 fn render(mut renderer: gfx::Renderer, width: u16, height: u16,
-          ev_chan: Receiver<glinit::Event>) {
+          ev_recv: game::EventReceiver) {
     let frame = gfx::Frame::new(width, height);
-    let mut game = game::Game::new(frame, &mut renderer);
+    let mut game = game::Game::new(frame, ev_recv, &mut renderer);
     while !renderer.should_finish() {
-        loop {
-            match ev_chan.try_recv() {
-                Ok(event) => game.on_event(event),
-                Err(comm::Empty) => break,
-                Err(comm::Disconnected) => return,
-            }
-        }
-        game.render(&mut renderer);
+        renderer = game.render(renderer);
         renderer.end_frame();
         for err in renderer.errors() {
             println!("Renderer error: {}", err);
