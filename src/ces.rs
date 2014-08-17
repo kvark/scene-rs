@@ -1,12 +1,39 @@
 //! Entity-Component System helpers
 
-use std::slice;
+use std::{fmt, slice};
 
 type IdType = u32;
 
-#[deriving(Clone, PartialEq, Show)]
+//#[deriving(Clone, PartialEq, Show)]
 pub struct Id<S>(IdType);
 
+impl<S> Id<S> {
+	fn unwrap(&self) -> IdType {
+		let Id(i) = *self;
+		i
+	}
+}
+
+impl<S> Clone for Id<S> {
+	fn clone(&self) -> Id<S> {
+		Id(self.unwrap())
+	}
+}
+
+impl<S> PartialEq for Id<S> {
+	fn eq(&self, other: &Id<S>) -> bool {
+		self.unwrap() == other.unwrap()
+	}
+}
+
+impl<S> fmt::Show for Id<S> {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "Id({})", self.unwrap())
+	}
+}
+
+
+#[deriving(Clone, Show)]
 pub struct Array<T>(Vec<T>);
 
 impl<T> Array<T> {

@@ -4,7 +4,7 @@
 macro_rules! world {
     ($space:ident ($param:ty), $($name:ident : $component:ty,)*) => {
         /// A collection of pointers to components
-        #[deriving(Clone)]
+        #[deriving(Clone, PartialEq, Show)]
         pub struct Entity {
             $(
             pub $name: Option<$space::Id<$component>>,

@@ -7,6 +7,8 @@ use gfx::DeviceHelper;
 use sys;
 use world;
 
+static SCREEN_EXTENTS: [f32, ..2] = [10.0, 10.0];
+
 pub type EventReceiver = (
 	Receiver<sys::control::Event>,
 	Receiver<sys::bullet::Event>
@@ -75,11 +77,11 @@ pub struct Game {
 }
 
 impl Game {
-	fn create_program<T, D: gfx::Device<T>>(device: &mut D) -> world::Program {
+	fn create_program<D: gfx::Device>(device: &mut D) -> world::Program {
 		device.link_program(
 			world::ShaderParam {
 				transform: [0.0, 0.0, 0.0, 1.0],
-				screen_scale: [0.1, 0.1, 0.0, 0.0],
+				screen_scale: [1.0 / SCREEN_EXTENTS[0], 1.0 / SCREEN_EXTENTS[1], 0.0, 0.0],
 			},
 			shaders! {
 			GLSL_120: b"
@@ -107,7 +109,7 @@ impl Game {
 		).unwrap()
 	}
 
-	fn create_ship<T, D: gfx::Device<T>>(device: &mut D, data: &mut world::Components,
+	fn create_ship<D: gfx::Device>(device: &mut D, data: &mut world::Components,
 				   draw: &mut sys::draw::System, program: world::Program)
 				   -> world::Entity {
 		let mesh = device.create_mesh(vec![
@@ -141,7 +143,7 @@ impl Game {
 			.entity
 	}
 
-	pub fn new<T, D: gfx::Device<T>>(frame: gfx::Frame,
+	pub fn new<D: gfx::Device>(frame: gfx::Frame,
 			   (ev_control, ev_bullet): EventReceiver, device: &mut D) -> Game {
 		let mut w = world::World::new();
 		// prepare systems
@@ -149,12 +151,30 @@ impl Game {
 		let mut draw_system = sys::draw::System::new(frame);
 		let bullet_draw = {
 			let mut mesh = device.create_mesh(vec![
-				Vertex::new(0.0, 0.0, 0xFF404000),
+				Vertex::new(0.0, 0.0, 0xFF808000),
 			]);
 			mesh.prim_type = gfx::Point;
 			let slice = mesh.get_slice();
 			let mut state = gfx::DrawState::new();
 			state.primitive.method = gfx::state::Point;
+			world::Drawable {
+				program: program.clone(),
+				mesh_id: draw_system.meshes.add(mesh),
+				state_id: draw_system.states.add(state),
+				slice: slice,
+			}
+		};
+		let aster_draw = {
+			let mut mesh = device.create_mesh(vec![
+				Vertex::new(-0.5, -0.5, 0xFFFFFF00),
+				Vertex::new(0.5, -0.5,  0xFFFFFF00),
+				Vertex::new(-0.5, 0.5,  0xFFFFFF00),
+				Vertex::new(0.5, 0.5,   0xFFFFFF00),
+			]);
+			mesh.prim_type = gfx::TriangleStrip;
+			let slice = mesh.get_slice();
+			let mut state = gfx::DrawState::new();
+			state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
 			world::Drawable {
 				program: program.clone(),
 				mesh_id: draw_system.meshes.add(mesh),
@@ -172,6 +192,7 @@ impl Game {
 			box sys::control::System::new(ev_control),
 			box sys::bullet::System::new(ev_bullet,
 				space_id, inertia_id, bullet_draw),
+			box sys::aster::System::new(SCREEN_EXTENTS, aster_draw),
 		]);
 		Game {
 			world: w,

@@ -56,6 +56,11 @@ pub struct Bullet {
 	pub life_time: Option<f32>,
 }
 
+#[deriving(Clone)]
+pub struct Asteroid {
+	pub kind: uint,
+}
+
 
 world! { ces (Params),
 	draw: Drawable,
@@ -63,4 +68,5 @@ world! { ces (Params),
 	inertia: Inertial,
 	control: Control,
 	bullet: Bullet,
+	aster: Asteroid,
 }

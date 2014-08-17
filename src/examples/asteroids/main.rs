@@ -12,6 +12,7 @@ use gfx::{Device, DeviceHelper};
 mod game;
 mod world;
 mod sys {
+    pub mod aster;
     pub mod bullet;
     pub mod control;
     pub mod draw;
