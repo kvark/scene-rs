@@ -1,6 +1,4 @@
-use cgmath::angle::{Angle, Rad};
-use cgmath::point::Point;
-use cgmath::vector::Vector;
+use cgmath::{Angle, Rad, Point, Vector};
 use w = world;
 
 pub enum Event {

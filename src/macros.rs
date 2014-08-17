@@ -66,7 +66,7 @@ macro_rules! world {
         pub struct World {
             pub data: Components,
             pub entities: Vec<Entity>,
-            pub systems: Vec<Box<System>>,
+            pub systems: Vec<Box<System + Send>>,
         }
 
         impl World {

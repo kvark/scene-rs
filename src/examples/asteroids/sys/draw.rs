@@ -17,10 +17,10 @@ impl System {
 		}
 	}
 
-	fn render(&mut self, ren: &mut gfx::Renderer, drawable: &w::Drawable) {
+	fn render(&mut self, list: &mut gfx::DrawList, drawable: &w::Drawable) {
 		let mesh = self.meshes.get(drawable.mesh_id);
 		let state = self.states.get(drawable.state_id);
-		ren.draw(mesh, drawable.slice, &self.frame, &drawable.program, state).unwrap();
+		list.draw(mesh, drawable.slice, &self.frame, &drawable.program, state).unwrap();
 	}
 }
 
@@ -32,14 +32,17 @@ impl w::System for System {
 			depth: None,
 			stencil: None,
 		};
-		renderer.clear(clear_data, self.frame);
+		renderer.clear(clear_data, &self.frame);
 		for ent in entities.iter() {
 			ent.draw.map(|d_id| {
 				let drawable = data.draw.get_mut(d_id);
-				ent.space.map(|s_id| {
-					let s = data.space.get(s_id);
-					drawable.program.data.transform = [s.pos.x, s.pos.y, s.orient.s, s.scale];
-				});
+				match ent.space {
+					Some(s_id) => {
+						let s = data.space.get(s_id);
+						drawable.program.data.transform = [s.pos.x, s.pos.y, s.orient.s, s.scale];
+					}
+					None => ()
+				}
 				self.render(*renderer, drawable)
 			});
 		}

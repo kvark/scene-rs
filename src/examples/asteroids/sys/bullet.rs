@@ -1,6 +1,4 @@
-use cgmath::angle::{Angle, Rad};
-use cgmath::point::Point;
-use cgmath::vector::Vector;
+use cgmath::{Angle, Rad, Point, Vector};
 use scenegraph::ces;
 use w = world;
 
@@ -75,7 +73,7 @@ impl w::System for System {
 					data.add()
 						.space(space)
 						.inertia(inertia)
-						.draw(self.draw)
+						.draw(self.draw.clone())
 						.bullet(bullet)
 						.entity
 				},

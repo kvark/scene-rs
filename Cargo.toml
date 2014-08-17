@@ -6,6 +6,6 @@ authors = [
     "Dzmitry Malyshau <kvarkus@gmail.com>",
 ]
 
-[[lib]]
+[lib]
 name = "scenegraph"
 path = "src/lib.rs"

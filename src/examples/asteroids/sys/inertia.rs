@@ -1,6 +1,4 @@
-use cgmath::angle::Angle;
-use cgmath::point::Point;
-use cgmath::vector::Vector;
+use cgmath::{Angle, Point, Vector};
 use w = world;
 
 pub struct System;
@@ -10,12 +8,15 @@ impl w::System for System {
 		for ent in entities.iter() {
 			ent.space.map(|s_id| {
 				let s = data.space.get_mut(s_id);
-				ent.inertia.map(|i_id| {
-					let i = data.inertia.get(i_id);
-					let move = i.velocity.mul_s(time);
-					s.pos.add_self_v(&move);
-					s.orient.add_self_a(i.angular_velocity.mul_s(time));
-				});
+				match ent.inertia {
+					Some(i_id) => {
+						let i = data.inertia.get(i_id);
+						let move = i.velocity.mul_s(time);
+						s.pos.add_self_v(&move);
+						s.orient.add_self_a(i.angular_velocity.mul_s(time));
+					},
+					None => (),
+				}
 			});
 		}
 	}

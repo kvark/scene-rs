@@ -1,13 +1,13 @@
 #![feature(phase)]
 #![crate_name = "asteroids"]
 
-extern crate native;
 extern crate cgmath;
 extern crate gfx;
-extern crate gl_init_platform;
-extern crate glinit = "gl-init-rs";
+extern crate gl_init;
 #[phase(plugin, link)]
 extern crate scenegraph;
+
+use gfx::{Device, DeviceHelper};
 
 mod game;
 mod world;
@@ -19,45 +19,53 @@ mod sys {
 }
 
 fn main() {
-    let builder = glinit::WindowBuilder::new()
+    let window = gl_init::WindowBuilder::new()
         .with_title("Asteroids example for #scenegraph-rs".to_string())
-        .with_gl_version((3,2));
+        .with_gl_version((3,2))
+        .build().unwrap();
 
-    let window = gl_init_platform::Window::from_builder(builder)
-        .unwrap();
     unsafe { window.make_current() };
-    let (w, h) = window.get_inner_size().unwrap();
-    let (ev_send, ev_recv) = game::EventSender::new();
+    let mut device = gfx::GlDevice::new(|s| window.get_proc_address(s));
 
-    let mut device = gfx::build()
-        .with_context(&window)
-        .with_provider(&window)
-        .with_queue_size(1)
-        .spawn(proc(r) render(r, w as u16, h as u16, ev_recv))
-        .unwrap();
+    let (w, h) = window.get_inner_size().unwrap();
+    let frame = gfx::Frame::new(w as u16, h as u16);
+    let (ev_send, ev_recv) = game::EventSender::new();
+    let game = game::Game::new(frame, ev_recv, &mut device);
+    let (game_send, dev_recv) = channel();
+    let (dev_send, game_recv) = channel();
+
+    let list = device.create_draw_list();
+    game_send.send(list.clone_empty()); // double-buffering draw lists
+    game_send.send(list);
+
+    spawn(proc() {
+        let mut game = game;
+        loop {
+            let mut list: gfx::DrawList = match game_recv.recv_opt() {
+                Ok(l) => l,
+                Err(_) => break,
+            };
+            list.reset();
+            game.render(&mut list);
+            match game_send.send_opt(list) {
+                Ok(_) => (),
+                Err(_) => break,
+            }
+        }
+    });
 
     'main: loop {
+        let list = dev_recv.recv();
         // quit when Esc is pressed.
         for event in window.poll_events() {
             match event {
-                glinit::Pressed(glinit::Escape) => break 'main,
-                glinit::Closed => break 'main,
+                gl_init::KeyboardInput(_, _, Some(gl_init::Escape), _) => break 'main,
+                gl_init::Closed => break 'main,
                 _ => ev_send.process(event),
             }
         }
-        device.update();
-    }
-}
-
-fn render(mut renderer: gfx::Renderer, width: u16, height: u16,
-          ev_recv: game::EventReceiver) {
-    let frame = gfx::Frame::new(width, height);
-    let mut game = game::Game::new(frame, ev_recv, &mut renderer);
-    while !renderer.should_finish() {
-        game.render(&mut renderer);
-        renderer.end_frame();
-        for err in renderer.errors() {
-            println!("Renderer error: {}", err);
-        }
+        device.submit(list.as_slice());
+        dev_send.send(list);
+        window.swap_buffers();
     }
 }

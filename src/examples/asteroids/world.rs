@@ -1,15 +1,12 @@
 #[phase(plugin)]
 extern crate gfx_macros;
 
-use cgmath::angle::Rad;
-use cgmath::rotation::{Basis2, Rotation, Rotation2};
-use cgmath::point::Point2;
-use cgmath::vector::Vector2;
+use cgmath::{Rad, Basis2, Rotation, Rotation2, Point2, Vector2};
 use gfx;
 use scenegraph::ces;
 
 pub type Delta = f32;
-pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::Renderer);
+pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::DrawList);
 
 #[shader_param(Program)]
 pub struct ShaderParam {
@@ -20,17 +17,12 @@ pub struct ShaderParam {
 
 /// --- Components ---
 
+#[deriving(Clone)]
 pub struct Drawable {
 	pub program: Program,
 	pub mesh_id: ces::Id<gfx::Mesh>,
 	pub state_id: ces::Id<gfx::DrawState>,
 	pub slice: gfx::Slice,
-}
-
-impl Clone for Drawable {
-	fn clone(&self) -> Drawable {
-		*self
-	}
 }
 
 #[deriving(Clone)]
