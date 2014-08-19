@@ -61,6 +61,13 @@ pub struct Asteroid {
     pub kind: uint,
 }
 
+#[deriving(Clone)]
+pub struct Collision {
+    pub radius: f32,
+    pub health: uint,
+    pub damage: uint,
+}
+
 
 world! { ces (Params),
     draw: Drawable,
@@ -69,4 +76,5 @@ world! { ces (Params),
     control: Control,
     bullet: Bullet,
     aster: Asteroid,
+    collision: Collision,
 }

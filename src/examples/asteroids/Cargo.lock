@@ -1,0 +1,130 @@
+[root]
+name = "asteroids"
+version = "0.1.0"
+dependencies = [
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#62cbb44e1c215838ba072eea0c13606261545659)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+ "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#24dbe322f7039326a60868b0e449eb64873f62c0)",
+ "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd)",
+ "ncollide2df32 0.1.0 (git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9)",
+ "scenegraph 0.1.0",
+]
+
+[[package]]
+name = "cgmath"
+version = "0.0.1"
+source = "git+https://github.com/bjz/cgmath-rs#62cbb44e1c215838ba072eea0c13606261545659"
+
+[[package]]
+name = "compile_msg"
+version = "0.1.0"
+source = "git+https://github.com/huonw/compile_msg#332e8bfc66cebad0a7e385c06f710b59517a3152"
+
+[[package]]
+name = "device"
+version = "0.1.0"
+source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+dependencies = [
+ "gl 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
+]
+
+[[package]]
+name = "dim2"
+version = "1.0.0"
+source = "git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9"
+
+[[package]]
+name = "gfx"
+version = "0.1.0"
+source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+dependencies = [
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+]
+
+[[package]]
+name = "gfx_macros"
+version = "0.1.0"
+source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+
+[[package]]
+name = "gl"
+version = "0.0.1"
+source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809"
+dependencies = [
+ "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
+]
+
+[[package]]
+name = "gl_generator"
+version = "0.0.1"
+source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809"
+dependencies = [
+ "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
+ "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#a0874f1f685e8ba7235855c54997295cb0a4b68a)",
+]
+
+[[package]]
+name = "gl_init"
+version = "0.0.1"
+source = "git+https://github.com/tomaka/gl-init-rs.git#24dbe322f7039326a60868b0e449eb64873f62c0"
+dependencies = [
+ "compile_msg 0.1.0 (git+https://github.com/huonw/compile_msg#332e8bfc66cebad0a7e385c06f710b59517a3152)",
+]
+
+[[package]]
+name = "glfw"
+version = "0.0.1"
+source = "git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd"
+dependencies = [
+ "link_glfw 0.1.0 (git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd)",
+ "semver 0.0.1 (git+https://github.com/rust-lang/semver#c78b40d7fdf8acd99b503e6ce394fbcf9eb8982f)",
+]
+
+[[package]]
+name = "khronos_api"
+version = "0.0.1"
+source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809"
+
+[[package]]
+name = "link_glfw"
+version = "0.1.0"
+source = "git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd"
+
+[[package]]
+name = "nalgebra"
+version = "0.1.0"
+source = "git+https://github.com/sebcrozet/nalgebra#1b7cd5fe1fcc3d0a47c626d0672b4827b7e640ae"
+
+[[package]]
+name = "ncollide2df32"
+version = "0.1.0"
+source = "git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9"
+dependencies = [
+ "dim2 1.0.0 (git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9)",
+ "nalgebra 0.1.0 (git+https://github.com/sebcrozet/nalgebra#1b7cd5fe1fcc3d0a47c626d0672b4827b7e640ae)",
+]
+
+[[package]]
+name = "render"
+version = "0.1.0"
+source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+dependencies = [
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+]
+
+[[package]]
+name = "rust-xml"
+version = "0.1.0"
+source = "git+https://github.com/netvl/rust-xml#a0874f1f685e8ba7235855c54997295cb0a4b68a"
+
+[[package]]
+name = "scenegraph"
+version = "0.1.0"
+
+[[package]]
+name = "semver"
+version = "0.0.1"
+source = "git+https://github.com/rust-lang/semver#c78b40d7fdf8acd99b503e6ce394fbcf9eb8982f"
+

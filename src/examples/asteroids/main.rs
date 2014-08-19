@@ -23,7 +23,7 @@ mod sys {
 }
 
 fn game_loop(mut game: game::Game, list_recv: Receiver<gfx::DrawList>, list_end: Sender<gfx::DrawList>) {
-    loop {
+    while game.is_alive() {
         let mut list = match list_recv.recv_opt() {
             Ok(l) => l,
             Err(_) => break,

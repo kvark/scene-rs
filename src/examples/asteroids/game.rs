@@ -160,4 +160,14 @@ impl Game {
         self.last_time = new_time;
         self.world.update(&mut (delta, list));
     }
+
+    pub fn is_alive(&self) -> bool {
+        self.world.entities.iter().find(|e| {
+            match (e.control, e.collision) {
+                (Some(_), Some(o_id)) =>
+                    self.world.data.collision.get(o_id).health != 0,
+                _ => false,
+            }
+        }).is_some()
+    }
 }
