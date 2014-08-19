@@ -16,8 +16,8 @@ path = "../../.."
 [dependencies.cgmath]
 git = "https://github.com/bjz/cgmath-rs"
 
-[dependencies.ncollide2df32]
-git = "https://github.com/sebcrozet/ncollide"
+#[dependencies.ncollide2df32]
+#git = "https://github.com/sebcrozet/ncollide"
 
 [dependencies.gfx]
 git = "https://github.com/gfx-rs/gfx-rs"

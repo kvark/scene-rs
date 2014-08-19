@@ -148,6 +148,7 @@ impl Game {
             box sys::bullet::System::new(ev_bullet,
                 space_id, inertia_id, bullet_draw),
             box sys::aster::System::new(SCREEN_EXTENTS, aster_draw),
+            box sys::physics::System::new(),
         ]);
         Game {
             world: w,

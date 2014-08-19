@@ -9,10 +9,10 @@ impl System {
 }
 
 impl w::System for System {
-	fn process(&mut self, &(time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
+	fn process(&mut self, _: w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
 		for i in range(0, entities.len()) {
 			for j in range(i+1, entities.len()) {
-				
+				let _ = (i, j, &data);
 			}
 		}
 	}

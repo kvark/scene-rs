@@ -20,6 +20,7 @@ mod sys {
     pub mod control;
     pub mod draw;
     pub mod inertia;
+    pub mod physics;
 }
 
 fn game_loop(mut game: game::Game, list_recv: Receiver<gfx::DrawList>, list_end: Sender<gfx::DrawList>) {
@@ -43,6 +44,13 @@ fn main() {
     let (ev_send, ev_recv) = event::SenderHub::new();
     let (game_send, dev_recv) = channel();
     let (dev_send, game_recv) = channel();
+
+    println!("
+    Controls:
+        A - thrust
+        S - shoot
+        Left/Right - turn"
+    );
 
     if use_glfw {
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();

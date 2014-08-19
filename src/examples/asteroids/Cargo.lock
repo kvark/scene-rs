@@ -2,18 +2,17 @@
 name = "asteroids"
 version = "0.1.0"
 dependencies = [
- "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#62cbb44e1c215838ba072eea0c13606261545659)",
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0)",
  "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96)",
  "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#24dbe322f7039326a60868b0e449eb64873f62c0)",
  "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd)",
- "ncollide2df32 0.1.0 (git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9)",
  "scenegraph 0.1.0",
 ]
 
 [[package]]
 name = "cgmath"
 version = "0.0.1"
-source = "git+https://github.com/bjz/cgmath-rs#62cbb44e1c215838ba072eea0c13606261545659"
+source = "git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0"
 
 [[package]]
 name = "compile_msg"
@@ -27,11 +26,6 @@ source = "git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df23
 dependencies = [
  "gl 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
 ]
-
-[[package]]
-name = "dim2"
-version = "1.0.0"
-source = "git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9"
 
 [[package]]
 name = "gfx"
@@ -91,20 +85,6 @@ source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47
 name = "link_glfw"
 version = "0.1.0"
 source = "git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd"
-
-[[package]]
-name = "nalgebra"
-version = "0.1.0"
-source = "git+https://github.com/sebcrozet/nalgebra#1b7cd5fe1fcc3d0a47c626d0672b4827b7e640ae"
-
-[[package]]
-name = "ncollide2df32"
-version = "0.1.0"
-source = "git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9"
-dependencies = [
- "dim2 1.0.0 (git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9)",
- "nalgebra 0.1.0 (git+https://github.com/sebcrozet/nalgebra#1b7cd5fe1fcc3d0a47c626d0672b4827b7e640ae)",
-]
 
 [[package]]
 name = "render"
