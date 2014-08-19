@@ -3,7 +3,7 @@ name = "asteroids"
 version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#62cbb44e1c215838ba072eea0c13606261545659)",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96)",
  "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#24dbe322f7039326a60868b0e449eb64873f62c0)",
  "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#e67b8c343fca0180fade23bf3f98413be8d2fecd)",
  "ncollide2df32 0.1.0 (git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992dd7bc2939ad9)",
@@ -23,7 +23,7 @@ source = "git+https://github.com/huonw/compile_msg#332e8bfc66cebad0a7e385c06f710
 [[package]]
 name = "device"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+source = "git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96"
 dependencies = [
  "gl 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
 ]
@@ -36,17 +36,17 @@ source = "git+https://github.com/sebcrozet/ncollide#648d5273a8621da0c8988c757992
 [[package]]
 name = "gfx"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+source = "git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
- "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
- "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96)",
 ]
 
 [[package]]
 name = "gfx_macros"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+source = "git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96"
 
 [[package]]
 name = "gl"
@@ -109,9 +109,9 @@ dependencies = [
 [[package]]
 name = "render"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35"
+source = "git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#9febfa55153cbe07a46a8795bd973dd0841a3f35)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#084b775f89cd5c37794cc16181a35df2357a3d96)",
 ]
 
 [[package]]

@@ -33,10 +33,6 @@ pub struct Game {
 impl Game {
     fn create_program<D: gfx::Device>(device: &mut D) -> world::Program {
         device.link_program(
-            world::ShaderParam {
-                transform: [0.0, 0.0, 0.0, 1.0],
-                screen_scale: [1.0 / SCREEN_EXTENTS[0], 1.0 / SCREEN_EXTENTS[1], 0.0, 0.0],
-            },
             shaders! {
             GLSL_120: b"
                 #version 120
@@ -94,6 +90,11 @@ impl Game {
                 thrust_speed: 4.0,
                 turn_speed: -90.0,
             })
+            .collision(world::Collision {
+                radius: 1.0,
+                health: 1,
+                damage: 1,
+            })
             .entity
     }
 
@@ -102,7 +103,7 @@ impl Game {
         let mut w = world::World::new();
         // prepare systems
         let program = Game::create_program(device);
-        let mut draw_system = sys::draw::System::new(frame);
+        let mut draw_system = sys::draw::System::new(SCREEN_EXTENTS, frame);
         let bullet_draw = {
             let mut mesh = device.create_mesh(vec![
                 Vertex::new(0.0, 0.0, 0xFF808000),
