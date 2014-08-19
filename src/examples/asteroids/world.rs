@@ -1,6 +1,7 @@
 #[phase(plugin)]
 extern crate gfx_macros;
 
+use std::cmp;
 use cgmath::{Rad, Basis2, Rotation, Rotation2, Point2, Vector2};
 use gfx;
 use scenegraph::ces;
@@ -66,6 +67,12 @@ pub struct Collision {
     pub radius: f32,
     pub health: uint,
     pub damage: uint,
+}
+
+impl Collision {
+    pub fn hit(&mut self, d: uint) {
+        self.health = cmp::max(self.health, d) - d;
+    }
 }
 
 

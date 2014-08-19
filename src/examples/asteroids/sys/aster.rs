@@ -50,11 +50,17 @@ impl System {
         let aster = w::Asteroid {
             kind: 0,
         };
+        let collide = w::Collision {
+            radius: 0.5,
+            health: 1,
+            damage: 2,
+        };
         match self.pools[0].pop() {
             Some(ent) => {
                 *data.space.get_mut(ent.space.unwrap()) = space;
                 *data.inertia.get_mut(ent.inertia.unwrap()) = inertia;
                 *data.aster.get_mut(ent.aster.unwrap()) = aster;
+                *data.collision.get_mut(ent.collision.unwrap()) = collide;
                 ent
             },
             None => {
@@ -63,6 +69,7 @@ impl System {
                     .inertia(inertia)
                     .draw(self.draw.clone())
                     .aster(aster)
+                    .collision(collide)
                     .entity
             },
         }
@@ -73,8 +80,9 @@ impl w::System for System {
     fn process(&mut self, &(time, _): w::Params, data: &mut w::Components, entities: &mut Vec<w::Entity>) {
         // cleanup
         let (new_entities, reserve) = entities.partitioned(|e| {
-            match (e.aster, e.space) {
-                (Some(_), Some(s_id)) => {
+            match (e.aster, e.space, e.collision) {
+                (Some(_), Some(s_id), Some(c_id)) => {
+                    let is_destroyed = data.collision.get(c_id).health == 0;
                     let s = data.space.get(s_id);
                     let is_in =
                         s.pos.x.abs() <= self.screen_ext[0] &&
@@ -86,7 +94,7 @@ impl w::System for System {
                         },
                         None => false,
                     };
-                    is_in || is_heading_in
+                    !is_destroyed && (is_in || is_heading_in)
                 },
                 _ => true,
             }

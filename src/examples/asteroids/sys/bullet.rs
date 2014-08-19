@@ -53,8 +53,9 @@ impl w::System for System {
             let (space, inertia) = {
                 let e_space = data.space.get(self.ship_space_id);
                 let e_inertia = data.inertia.get(self.ship_inertia_id);
+                let offset = e_space.get_direction().mul_s(0.5);
                 (w::Spatial {
-                    pos: e_space.pos,
+                    pos: e_space.pos.add_v(&offset),
                     orient: Rad{ s: 0.0 },
                     scale: 0.1,
                 }, w::Inertial {
@@ -62,11 +63,17 @@ impl w::System for System {
                     angular_velocity: Rad{ s: 0.0 },
                 })
             };
+            let collide = w::Collision {
+                radius: 0.01,
+                health: 1,
+                damage: 1,
+            };
             let ent = match self.pool.pop() {
                 Some(ent) => {
                     *data.bullet.get_mut(ent.bullet.unwrap()) = bullet;
                     *data.space.get_mut(ent.space.unwrap()) = space;
                     *data.inertia.get_mut(ent.inertia.unwrap()) = inertia;
+                    *data.collision.get_mut(ent.collision.unwrap()) = collide;
                     ent
                 },
                 None => {
@@ -75,16 +82,18 @@ impl w::System for System {
                         .inertia(inertia)
                         .draw(self.draw.clone())
                         .bullet(bullet)
+                        .collision(collide)
                         .entity
                 },
             };
             entities.push(ent);
         }
         let (new_entities, reserve) = entities.partitioned(|ent| {
-            match ent.bullet {
-                Some(b_id) => {
+            match (ent.bullet, ent.collision) {
+                (Some(b_id), Some(c_id)) => {
+                    let is_destroyed = data.collision.get(c_id).health == 0;
                     let bullet = data.bullet.get_mut(b_id);
-                    match bullet.life_time {
+                    let is_in_time = match bullet.life_time {
                         Some(ref mut t) if *t>time => {
                             *t -= time;
                             true
@@ -94,9 +103,10 @@ impl w::System for System {
                             false
                         },
                         None => true,
-                    }
+                    };
+                    !is_destroyed && is_in_time
                 },
-                None => true,
+                _ => true,
             }
         });
         *entities = new_entities;

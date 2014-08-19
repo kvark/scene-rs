@@ -38,19 +38,21 @@ fn game_loop(mut game: game::Game, list_recv: Receiver<gfx::DrawList>, list_end:
     }
 }
 
+static USAGE: &'static str = "
+Controls:
+    A - thrust
+    S - shoot
+    Left/Right - turn
+";
+
 fn main() {
-    let use_glfw = false;
+    let use_glfw = true;
     let title = "Asteroids example for #scenegraph-rs";
     let (ev_send, ev_recv) = event::SenderHub::new();
     let (game_send, dev_recv) = channel();
     let (dev_send, game_recv) = channel();
 
-    println!("
-    Controls:
-        A - thrust
-        S - shoot
-        Left/Right - turn"
-    );
+    println!("{}", USAGE);
 
     if use_glfw {
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -78,7 +80,10 @@ fn main() {
         spawn(proc() game_loop(game, game_recv, game_send));
 
         while !window.should_close() {
-            let list = dev_recv.recv();
+            let list = match dev_recv.recv_opt() {
+                Ok(l) => l,
+                Err(_) => break,
+            };
             glfw.poll_events();
             // quit when Esc is pressed.
             for (_, event) in glfw::flush_messages(&events) {
@@ -89,7 +94,10 @@ fn main() {
                 }
             }
             device.submit(list.as_slice());
-            dev_send.send(list);
+            match dev_send.send_opt(list) {
+                Ok(_) => (),
+                Err(_) => break,
+            }
             window.swap_buffers();
         }
     }else {

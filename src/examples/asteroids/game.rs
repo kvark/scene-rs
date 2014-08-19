@@ -91,9 +91,9 @@ impl Game {
                 turn_speed: -90.0,
             })
             .collision(world::Collision {
-                radius: 1.0,
-                health: 1,
-                damage: 1,
+                radius: 0.2,
+                health: 3,
+                damage: 2,
             })
             .entity
     }
