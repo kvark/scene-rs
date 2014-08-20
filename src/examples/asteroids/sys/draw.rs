@@ -19,11 +19,12 @@ impl System {
         }
     }
 
-    fn render<'a>(&mut self, list: &mut gfx::DrawList, drawable: &'a w::Drawable,
+    fn render<'a>(&mut self, renderer: &mut gfx::Renderer, drawable: &'a w::Drawable,
               param: &'a w::ShaderParam) {
         let mesh = self.meshes.get(drawable.mesh_id);
         let state = self.states.get(drawable.state_id);
-        list.draw(mesh, drawable.slice, &self.frame, (&drawable.program, param), state).unwrap();
+        renderer.draw(mesh, drawable.slice, &self.frame,
+            (&drawable.program, param), state).unwrap();
     }
 }
 

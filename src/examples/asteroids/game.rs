@@ -156,11 +156,11 @@ impl Game {
         }
     }
 
-    pub fn render(&mut self, list: &mut gfx::DrawList) {
+    pub fn render(&mut self, renderer: &mut gfx::Renderer) {
         let new_time = time::precise_time_ns();
         let delta = (new_time - self.last_time) as f32 / 1e9;
         self.last_time = new_time;
-        self.world.update(&mut (delta, list));
+        self.world.update(&mut (delta, renderer));
     }
 
     pub fn is_alive(&self) -> bool {

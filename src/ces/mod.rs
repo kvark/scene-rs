@@ -1,6 +1,8 @@
-//! Entity-Component System helpers
+//! Entity-Component System
 
 use std::{fmt, slice};
+
+pub mod macros;
 
 type IdType = u32;
 

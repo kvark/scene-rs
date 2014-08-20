@@ -1,5 +1,3 @@
-use ces;
-
 pub type SimpleComponent = int;
 world! { ces (()),
     simple : SimpleComponent,

@@ -23,15 +23,15 @@ mod sys {
     pub mod physics;
 }
 
-fn game_loop(mut game: game::Game, list_recv: Receiver<gfx::DrawList>, list_end: Sender<gfx::DrawList>) {
+fn game_loop(mut game: game::Game, ren_recv: Receiver<gfx::Renderer>, ren_end: Sender<gfx::Renderer>) {
     while game.is_alive() {
-        let mut list = match list_recv.recv_opt() {
-            Ok(l) => l,
+        let mut renderer = match ren_recv.recv_opt() {
+            Ok(r) => r,
             Err(_) => break,
         };
-        list.reset();
-        game.render(&mut list);
-        match list_end.send_opt(list) {
+        renderer.reset();
+        game.render(&mut renderer);
+        match ren_end.send_opt(renderer) {
             Ok(_) => (),
             Err(_) => break,
         }
@@ -73,15 +73,15 @@ fn main() {
         let frame = gfx::Frame::new(w as u16, h as u16);
         let game = game::Game::new(frame, ev_recv, &mut device);
 
-        let list = device.create_draw_list();
-        game_send.send(list.clone_empty()); // double-buffering draw lists
-        game_send.send(list);
+        let renderer = device.create_renderer();
+        game_send.send(renderer.clone_empty()); // double-buffering renderers
+        game_send.send(renderer);
 
         spawn(proc() game_loop(game, game_recv, game_send));
 
         while !window.should_close() {
-            let list = match dev_recv.recv_opt() {
-                Ok(l) => l,
+            let renderer = match dev_recv.recv_opt() {
+                Ok(r) => r,
                 Err(_) => break,
             };
             glfw.poll_events();
@@ -93,8 +93,8 @@ fn main() {
                     _ => ev_send.process_glfw(event),
                 }
             }
-            device.submit(list.as_slice());
-            match dev_send.send_opt(list) {
+            device.submit(renderer.as_buffer());
+            match dev_send.send_opt(renderer) {
                 Ok(_) => (),
                 Err(_) => break,
             }
@@ -113,14 +113,14 @@ fn main() {
         let frame = gfx::Frame::new(w as u16, h as u16);
         let game = game::Game::new(frame, ev_recv, &mut device);
 
-        let list = device.create_draw_list();
-        game_send.send(list.clone_empty()); // double-buffering draw lists
-        game_send.send(list);
+        let renderer = device.create_renderer();
+        game_send.send(renderer.clone_empty()); // double-buffering renderers
+        game_send.send(renderer);
 
         spawn(proc() game_loop(game, game_recv, game_send));
 
         'main: loop {
-            let list = dev_recv.recv();
+            let renderer = dev_recv.recv();
             // quit when Esc is pressed.
             for event in window.poll_events() {
                 match event {
@@ -129,8 +129,8 @@ fn main() {
                     _ => ev_send.process_gl_init(event),
                 }
             }
-            device.submit(list.as_slice());
-            dev_send.send(list);
+            device.submit(renderer.as_buffer());
+            dev_send.send(renderer);
             window.swap_buffers();
         }
     };
