@@ -34,12 +34,12 @@ impl Game {
     fn create_program<D: gfx::Device>(device: &mut D) -> world::Program {
         device.link_program(
             shaders! {
-            GLSL_120: b"
-                #version 120
-                attribute vec2 pos;
-                attribute vec4 color;
+            GLSL_150: b"
+                #version 150 core
+                in vec2 pos;
+                in vec4 color;
                 uniform vec4 transform, screen_scale;
-                varying vec4 v_color;
+                out vec4 v_color;
                 void main() {
                     v_color = color;
                     vec2 sc = vec2(sin(transform.z), cos(transform.z));
@@ -49,9 +49,9 @@ impl Game {
                 }
             "},
             shaders! {
-            GLSL_120: b"
-                #version 120
-                varying vec4 v_color;
+            GLSL_150: b"
+                #version 150 core
+                in vec4 v_color;
                 void main() {
                     gl_FragColor = v_color;
                 }
