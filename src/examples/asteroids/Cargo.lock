@@ -6,8 +6,12 @@ dependencies = [
  "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080)",
  "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#ec8cbce6246f578ad4cf264dd8e5ce4a5a074ac4)",
  "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#dd1631883033c743cb041e35580196244b2a0c86)",
- "scenegraph 0.1.0",
+ "scene 0.1.0",
 ]
+
+[[package]]
+name = "ces"
+version = "0.1.0"
 
 [[package]]
 name = "cgmath"
@@ -100,8 +104,11 @@ version = "0.1.0"
 source = "git+https://github.com/netvl/rust-xml#b2531b0f2c1e3448402a5ed0f814fc1cc31af345"
 
 [[package]]
-name = "scenegraph"
+name = "scene"
 version = "0.1.0"
+dependencies = [
+ "ces 0.1.0",
+]
 
 [[package]]
 name = "semver"

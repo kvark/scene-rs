@@ -6,7 +6,7 @@ extern crate gfx;
 extern crate gl_init;
 extern crate glfw;
 #[phase(plugin, link)]
-extern crate scenegraph;
+extern crate ces;
 
 use glfw::Context;
 use gfx::{Device, DeviceHelper};
@@ -47,7 +47,7 @@ Controls:
 
 fn main() {
     let use_glfw = true;
-    let title = "Asteroids example for #scenegraph-rs";
+    let title = "Asteroids example for #scene-rs";
     let (ev_send, ev_recv) = event::SenderHub::new();
     let (game_send, dev_recv) = channel();
     let (dev_send, game_recv) = channel();

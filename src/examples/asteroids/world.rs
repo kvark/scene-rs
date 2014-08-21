@@ -4,7 +4,7 @@ extern crate gfx_macros;
 use std::cmp;
 use cgmath::{Rad, Basis2, Rotation, Rotation2, Point2, Vector2};
 use gfx;
-use scenegraph::ces;
+use ces;
 
 pub type Delta = f32;
 pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::Renderer);

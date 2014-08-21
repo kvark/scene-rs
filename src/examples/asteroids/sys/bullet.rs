@@ -1,5 +1,5 @@
 use cgmath::{Angle, Rad, Point, Vector};
-use scenegraph::ces;
+use ces;
 use w = world;
 
 pub enum Event {

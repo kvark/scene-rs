@@ -52,8 +52,9 @@ impl Game {
             GLSL_150: b"
                 #version 150 core
                 in vec4 v_color;
+                out vec4 color;
                 void main() {
-                    gl_FragColor = v_color;
+                    color = v_color;
                 }
             "}
         ).unwrap()

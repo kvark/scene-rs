@@ -1,11 +1,14 @@
 [package]
 
-name = "scenegraph"
+name = "scene"
 version = "0.1.0"
 authors = [
     "Dzmitry Malyshau <kvarkus@gmail.com>",
 ]
 
 [lib]
-name = "scenegraph"
+name = "scene"
 path = "src/lib.rs"
+
+[dependencies.ces]
+path = "src/ces/"

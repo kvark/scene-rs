@@ -1,4 +1,11 @@
 [root]
-name = "scenegraph"
+name = "scene"
+version = "0.1.0"
+dependencies = [
+ "ces 0.1.0",
+]
+
+[[package]]
+name = "ces"
 version = "0.1.0"
 

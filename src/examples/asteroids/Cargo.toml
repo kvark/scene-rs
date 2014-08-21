@@ -10,7 +10,7 @@ authors = [
 name = "asteroids"
 path = "main.rs"
 
-[dependencies.scenegraph]
+[dependencies.scene]
 path = "../../.."
 
 [dependencies.cgmath]

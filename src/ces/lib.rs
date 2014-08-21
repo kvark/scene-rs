@@ -1,8 +1,13 @@
 //! Entity-Component System
 
+#![crate_name = "ces"]
+#![feature(macro_rules)]
+
 use std::{fmt, slice};
 
 pub mod macros;
+#[cfg(test)]
+pub mod test;
 
 type IdType = u32;
 

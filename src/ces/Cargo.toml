@@ -1,0 +1,10 @@
+[package]
+
+name = "ces"
+version = "0.1.0"
+authors = [
+]
+
+[lib]
+name = "ces"
+path = "lib.rs"
