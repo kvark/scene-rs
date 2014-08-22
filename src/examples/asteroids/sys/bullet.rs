@@ -1,6 +1,6 @@
 use cgmath::{Angle, Rad, Point, Vector};
 use ces;
-use w = world;
+use world as w;
 
 pub enum Event {
     EvShoot(bool),

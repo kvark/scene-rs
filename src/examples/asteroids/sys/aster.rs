@@ -1,6 +1,6 @@
 use std::rand::{Rng, StdRng};
 use cgmath::{Angle, Deg, Rad, ToRad, Point, Point2, Vector, sin, cos};
-use w = world;
+use world as w;
 
 static KINDS: uint = 2;
 
