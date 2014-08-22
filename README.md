@@ -1,5 +1,6 @@
 Scene-rs
 ===
+[![Build Status](https://travis-ci.org/kvark/scene-rs.png?branch=master)](https://travis-ci.org/kvark/scene-rs)
 
 ### Research directions:
 * Component-Entity Systems (_in progress_)

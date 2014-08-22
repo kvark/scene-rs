@@ -67,7 +67,8 @@ impl Game {
             Vertex::new(-0.3, -0.5, 0x20C02000),
             Vertex::new(0.3, -0.5,  0x20C02000),
             Vertex::new(0.0, 0.5,   0xC0404000),
-        ]);
+            ], gfx::TriangleList
+        );
         let slice = mesh.get_slice();
         let mut state = gfx::DrawState::new();
         state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
@@ -106,10 +107,10 @@ impl Game {
         let program = Game::create_program(device);
         let mut draw_system = sys::draw::System::new(SCREEN_EXTENTS, frame);
         let bullet_draw = {
-            let mut mesh = device.create_mesh(vec![
+            let mesh = device.create_mesh(vec![
                 Vertex::new(0.0, 0.0, 0xFF808000),
-            ]);
-            mesh.prim_type = gfx::Point;
+                ], gfx::Point
+            );
             let slice = mesh.get_slice();
             let mut state = gfx::DrawState::new();
             state.primitive.method = gfx::state::Point;
@@ -121,13 +122,13 @@ impl Game {
             }
         };
         let aster_draw = {
-            let mut mesh = device.create_mesh(vec![
+            let mesh = device.create_mesh(vec![
                 Vertex::new(-0.5, -0.5, 0xFFFFFF00),
                 Vertex::new(0.5, -0.5,  0xFFFFFF00),
                 Vertex::new(-0.5, 0.5,  0xFFFFFF00),
                 Vertex::new(0.5, 0.5,   0xFFFFFF00),
-            ]);
-            mesh.prim_type = gfx::TriangleStrip;
+                ], gfx::TriangleStrip
+            );
             let slice = mesh.get_slice();
             let mut state = gfx::DrawState::new();
             state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);

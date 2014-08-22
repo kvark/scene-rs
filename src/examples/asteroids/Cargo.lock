@@ -3,7 +3,7 @@ name = "asteroids"
 version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0)",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
  "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#ec8cbce6246f578ad4cf264dd8e5ce4a5a074ac4)",
  "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#dd1631883033c743cb041e35580196244b2a0c86)",
  "scene 0.1.0",
@@ -26,41 +26,33 @@ source = "git+https://github.com/huonw/compile_msg#332e8bfc66cebad0a7e385c06f710
 [[package]]
 name = "device"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080"
+source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
 dependencies = [
- "gl 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
+ "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
 ]
 
 [[package]]
 name = "gfx"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080"
+source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080)",
- "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080)",
- "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
 ]
 
 [[package]]
 name = "gfx_macros"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080"
-
-[[package]]
-name = "gl"
-version = "0.0.1"
-source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809"
-dependencies = [
- "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
-]
+source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
 
 [[package]]
 name = "gl_generator"
 version = "0.0.1"
-source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809"
+source = "git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8"
 dependencies = [
- "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809)",
- "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#b2531b0f2c1e3448402a5ed0f814fc1cc31af345)",
+ "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
+ "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571a2b36f6a)",
 ]
 
 [[package]]
@@ -83,7 +75,7 @@ dependencies = [
 [[package]]
 name = "khronos_api"
 version = "0.0.1"
-source = "git+https://github.com/bjz/gl-rs.git#eaa6b307155ae7b9e6c2b95af8f428f47ad4d809"
+source = "git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8"
 
 [[package]]
 name = "link_glfw"
@@ -93,15 +85,15 @@ source = "git+https://github.com/bjz/glfw-rs.git#dd1631883033c743cb041e355801962
 [[package]]
 name = "render"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080"
+source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#4543091fc06ec00d40f38eceab17e6eb1ae3b080)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
 ]
 
 [[package]]
 name = "rust-xml"
 version = "0.1.0"
-source = "git+https://github.com/netvl/rust-xml#b2531b0f2c1e3448402a5ed0f814fc1cc31af345"
+source = "git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571a2b36f6a"
 
 [[package]]
 name = "scene"
