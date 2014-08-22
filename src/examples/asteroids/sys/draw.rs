@@ -1,6 +1,6 @@
 use gfx;
 use ces;
-use w = world;
+use world as w;
 
 pub struct System {
     extents: [f32, ..2],

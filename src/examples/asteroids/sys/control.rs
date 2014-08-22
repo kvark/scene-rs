@@ -1,5 +1,5 @@
 use cgmath::{Angle, Rad, Point, Vector};
-use w = world;
+use world as w;
 
 pub enum Event {
     EvThrust(f32),
