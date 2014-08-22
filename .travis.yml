@@ -1,0 +1,19 @@
+language: rust
+env:
+  global:
+    - LD_LIBRARY_PATH: /usr/local/lib
+notifications:
+before_install:
+install:
+  # glfw3
+  - sudo apt-get install libXxf86vm-dev xdotool
+  - git clone https://github.com/glfw/glfw.git
+  - cd glfw
+  - git checkout 3.0.3
+  - cmake -DCMAKE_C_FLAGS=-fPIC -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF .
+  - make
+  - sudo make install
+  - cd ..
+script:
+  - make
+after_script:
