@@ -2,10 +2,10 @@
 name = "scene"
 version = "0.1.0"
 dependencies = [
- "ces 0.1.0",
+ "ecs 0.1.0",
 ]
 
 [[package]]
-name = "ces"
+name = "ecs"
 version = "0.1.0"
 

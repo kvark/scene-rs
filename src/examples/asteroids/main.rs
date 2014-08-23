@@ -6,7 +6,7 @@ extern crate gfx;
 extern crate gl_init;
 extern crate glfw;
 #[phase(plugin, link)]
-extern crate ces;
+extern crate ecs;
 
 use glfw::Context;
 use gfx::{Device, DeviceHelper};

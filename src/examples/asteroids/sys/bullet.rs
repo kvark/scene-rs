@@ -1,5 +1,5 @@
 use cgmath::{Angle, Rad, Point, Vector};
-use ces;
+use ecs;
 use world as w;
 
 pub enum Event {
@@ -9,16 +9,16 @@ pub enum Event {
 pub struct System {
     input: Receiver<Event>,
     shoot: bool,
-    ship_space_id: ces::Id<w::Spatial>,
-    ship_inertia_id: ces::Id<w::Inertial>,
+    ship_space_id: ecs::Id<w::Spatial>,
+    ship_inertia_id: ecs::Id<w::Inertial>,
     draw: w::Drawable,
     cool_time: f32,
     pool: Vec<w::Entity>,
 }
 
 impl System {
-    pub fn new(chan: Receiver<Event>, space_id: ces::Id<w::Spatial>,
-               inertia_id: ces::Id<w::Inertial>, draw: w::Drawable) -> System {
+    pub fn new(chan: Receiver<Event>, space_id: ecs::Id<w::Spatial>,
+               inertia_id: ecs::Id<w::Inertial>, draw: w::Drawable) -> System {
         System {
             input: chan,
             shoot: false,

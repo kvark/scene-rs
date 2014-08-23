@@ -1,12 +1,12 @@
 use gfx;
-use ces;
+use ecs;
 use world as w;
 
 pub struct System {
     extents: [f32, ..2],
     pub frame: gfx::Frame,
-    pub meshes: ces::Array<gfx::Mesh>,
-    pub states: ces::Array<gfx::DrawState>,
+    pub meshes: ecs::Array<gfx::Mesh>,
+    pub states: ecs::Array<gfx::DrawState>,
 }
 
 impl System {
@@ -14,8 +14,8 @@ impl System {
         System {
             extents: extents,
             frame: frame,
-            meshes: ces::Array::new(),
-            states: ces::Array::new(),
+            meshes: ecs::Array::new(),
+            states: ecs::Array::new(),
         }
     }
 

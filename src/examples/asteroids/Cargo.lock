@@ -10,10 +10,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ces"
-version = "0.1.0"
-
-[[package]]
 name = "cgmath"
 version = "0.0.1"
 source = "git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0"
@@ -30,6 +26,10 @@ source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba7
 dependencies = [
  "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
 ]
+
+[[package]]
+name = "ecs"
+version = "0.1.0"
 
 [[package]]
 name = "gfx"
@@ -99,7 +99,7 @@ source = "git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571
 name = "scene"
 version = "0.1.0"
 dependencies = [
- "ces 0.1.0",
+ "ecs 0.1.0",
 ]
 
 [[package]]

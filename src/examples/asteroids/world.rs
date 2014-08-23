@@ -4,7 +4,7 @@ extern crate gfx_macros;
 use std::cmp;
 use cgmath::{Rad, Basis2, Rotation, Rotation2, Point2, Vector2};
 use gfx;
-use ces;
+use ecs;
 
 pub type Delta = f32;
 pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::Renderer);
@@ -21,8 +21,8 @@ pub struct ShaderParam {
 #[deriving(Clone)]
 pub struct Drawable {
     pub program: Program,
-    pub mesh_id: ces::Id<gfx::Mesh>,
-    pub state_id: ces::Id<gfx::DrawState>,
+    pub mesh_id: ecs::Id<gfx::Mesh>,
+    pub state_id: ecs::Id<gfx::DrawState>,
     pub slice: gfx::Slice,
 }
 
@@ -76,7 +76,7 @@ impl Collision {
 }
 
 
-world! { ces (Params),
+world! { ecs (Params),
     draw: Drawable,
     space: Spatial,
     inertia: Inertial,

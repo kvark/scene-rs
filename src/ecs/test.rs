@@ -1,5 +1,5 @@
 pub type SimpleComponent = int;
-world! { ces (()),
+world! { ecs (()),
     simple : SimpleComponent,
 }
 

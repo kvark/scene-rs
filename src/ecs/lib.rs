@@ -1,6 +1,6 @@
 //! Entity-Component System
 
-#![crate_name = "ces"]
+#![crate_name = "ecs"]
 #![feature(macro_rules)]
 
 use std::{fmt, slice};
