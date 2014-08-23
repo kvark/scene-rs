@@ -11,7 +11,8 @@ pub mod test;
 
 type IdType = u32;
 
-//#[deriving(Clone, PartialEq, Show)]
+// Deriving forces T to have the same properties, we can't afford that.
+//#[deriving(Clone, Eq, Ord, PartialEq, PartialOrd, Show)]
 pub struct Id<S>(IdType);
 
 impl<S> Id<S> {
@@ -27,9 +28,23 @@ impl<S> Clone for Id<S> {
     }
 }
 
+impl<S> Eq for Id<S> {}
+
+impl<S> Ord for Id<S> {
+    fn cmp(&self, other: &Id<S>) -> Ordering {
+        self.unwrap().cmp(&other.unwrap())
+    }
+}
+
 impl<S> PartialEq for Id<S> {
     fn eq(&self, other: &Id<S>) -> bool {
         self.unwrap() == other.unwrap()
+    }
+}
+
+impl<S> PartialOrd for Id<S> {
+    fn partial_cmp(&self, other: &Id<S>) -> Option<Ordering> {
+        self.unwrap().partial_cmp(&other.unwrap())
     }
 }
 
@@ -62,6 +77,10 @@ impl<T> Array<T> {
     pub fn get_mut(&mut self, Id(i): Id<T>) -> &mut T {
         let Array(ref mut a) = *self;
         a.get_mut(i as uint)
+    }
+
+    pub fn find_id(&self, fun: |&T| -> bool) -> Option<Id<T>> {
+        self.iter().position(fun).map(|i| Id(i as IdType))
     }
 
     pub fn iter<'a>(&'a self) -> slice::Items<'a, T> {

@@ -12,3 +12,6 @@ path = "src/lib.rs"
 
 [dependencies.ecs]
 path = "src/ecs/"
+
+[dependencies.render]
+path = "src/render/"

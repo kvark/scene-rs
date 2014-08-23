@@ -85,6 +85,15 @@ source = "git+https://github.com/bjz/glfw-rs.git#dd1631883033c743cb041e355801962
 [[package]]
 name = "render"
 version = "0.1.0"
+dependencies = [
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0)",
+ "ecs 0.1.0",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
+]
+
+[[package]]
+name = "render"
+version = "0.1.0"
 source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
 dependencies = [
  "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
@@ -100,6 +109,7 @@ name = "scene"
 version = "0.1.0"
 dependencies = [
  "ecs 0.1.0",
+ "render 0.1.0",
 ]
 
 [[package]]
