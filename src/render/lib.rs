@@ -72,3 +72,11 @@ pub struct View {
     pub camera: Camera,
 	pub queue: Queue,
 }
+
+impl View {
+	fn add(&mut self, mesh: &gfx::Mesh, slice: gfx::Slice, state: &gfx::DrawState,
+		program: gfx::shade::DictionaryProgram, bound: cgmath::Sphere<Scalar>) {
+		let _depth = 0u;
+		//self.queue.objects.push(Object {})
+	}
+}

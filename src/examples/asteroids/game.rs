@@ -67,9 +67,8 @@ impl Game {
             Vertex::new(-0.3, -0.5, 0x20C02000),
             Vertex::new(0.3, -0.5,  0x20C02000),
             Vertex::new(0.0, 0.5,   0xC0404000),
-            ], gfx::TriangleList
-        );
-        let slice = mesh.get_slice();
+        ]);
+        let slice = mesh.get_slice(gfx::TriangleList);
         let mut state = gfx::DrawState::new();
         state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
         data.add()
@@ -109,9 +108,8 @@ impl Game {
         let bullet_draw = {
             let mesh = device.create_mesh(vec![
                 Vertex::new(0.0, 0.0, 0xFF808000),
-                ], gfx::Point
-            );
-            let slice = mesh.get_slice();
+            ]);
+            let slice = mesh.get_slice(gfx::Point);
             let mut state = gfx::DrawState::new();
             state.primitive.method = gfx::state::Point;
             world::Drawable {
@@ -127,9 +125,8 @@ impl Game {
                 Vertex::new(0.5, -0.5,  0xFFFFFF00),
                 Vertex::new(-0.5, 0.5,  0xFFFFFF00),
                 Vertex::new(0.5, 0.5,   0xFFFFFF00),
-                ], gfx::TriangleStrip
-            );
-            let slice = mesh.get_slice();
+            ]);
+            let slice = mesh.get_slice(gfx::TriangleStrip);
             let mut state = gfx::DrawState::new();
             state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
             world::Drawable {

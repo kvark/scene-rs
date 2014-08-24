@@ -32,7 +32,7 @@ impl w::System for System {
     fn process(&mut self, &(_, ref mut renderer): w::Params, data: &mut w::Components,
                entities: &mut Vec<w::Entity>) {
         let clear_data = gfx::ClearData {
-            color: Some(gfx::Color([0.0, 0.0, 0.1, 0.0])),
+            color: Some([0.0, 0.0, 0.1, 0.0]),
             depth: None,
             stencil: None,
         };

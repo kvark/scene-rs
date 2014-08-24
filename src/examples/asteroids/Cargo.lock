@@ -2,9 +2,9 @@
 name = "asteroids"
 version = "0.1.0"
 dependencies = [
- "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0)",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
- "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#ec8cbce6246f578ad4cf264dd8e5ce4a5a074ac4)",
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#e54265cb611c1e585533b21ff3e3c293e7b5bd61)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
+ "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#d870fa7ffa1ff5e7a6a13048ada943aea51a04a6)",
  "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#dd1631883033c743cb041e35580196244b2a0c86)",
  "scene 0.1.0",
 ]
@@ -12,7 +12,7 @@ dependencies = [
 [[package]]
 name = "cgmath"
 version = "0.0.1"
-source = "git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0"
+source = "git+https://github.com/bjz/cgmath-rs#e54265cb611c1e585533b21ff3e3c293e7b5bd61"
 
 [[package]]
 name = "compile_msg"
@@ -22,7 +22,7 @@ source = "git+https://github.com/huonw/compile_msg#332e8bfc66cebad0a7e385c06f710
 [[package]]
 name = "device"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 dependencies = [
  "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
 ]
@@ -34,17 +34,17 @@ version = "0.1.0"
 [[package]]
 name = "gfx"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
- "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
- "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
 ]
 
 [[package]]
 name = "gfx_macros"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 
 [[package]]
 name = "gl_generator"
@@ -52,13 +52,13 @@ version = "0.0.1"
 source = "git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8"
 dependencies = [
  "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
- "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571a2b36f6a)",
+ "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#3a3f37e7014e591394329790565d63d6743c6901)",
 ]
 
 [[package]]
 name = "gl_init"
 version = "0.0.1"
-source = "git+https://github.com/tomaka/gl-init-rs.git#ec8cbce6246f578ad4cf264dd8e5ce4a5a074ac4"
+source = "git+https://github.com/tomaka/gl-init-rs.git#d870fa7ffa1ff5e7a6a13048ada943aea51a04a6"
 dependencies = [
  "compile_msg 0.1.0 (git+https://github.com/huonw/compile_msg#332e8bfc66cebad0a7e385c06f710b59517a3152)",
 ]
@@ -86,23 +86,23 @@ source = "git+https://github.com/bjz/glfw-rs.git#dd1631883033c743cb041e355801962
 name = "render"
 version = "0.1.0"
 dependencies = [
- "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0)",
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#e54265cb611c1e585533b21ff3e3c293e7b5bd61)",
  "ecs 0.1.0",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
 ]
 
 [[package]]
 name = "render"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#2dbf7966fb0ffd55c952b39a0b52f8ba73ce4fd4)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
 ]
 
 [[package]]
 name = "rust-xml"
 version = "0.1.0"
-source = "git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571a2b36f6a"
+source = "git+https://github.com/netvl/rust-xml#3a3f37e7014e591394329790565d63d6743c6901"
 
 [[package]]
 name = "scene"

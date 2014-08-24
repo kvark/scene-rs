@@ -9,12 +9,12 @@ dependencies = [
 [[package]]
 name = "cgmath"
 version = "0.0.1"
-source = "git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0"
+source = "git+https://github.com/bjz/cgmath-rs#e54265cb611c1e585533b21ff3e3c293e7b5bd61"
 
 [[package]]
 name = "device"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 dependencies = [
  "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
 ]
@@ -26,17 +26,17 @@ version = "0.1.0"
 [[package]]
 name = "gfx"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678)",
- "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678)",
- "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
 ]
 
 [[package]]
 name = "gfx_macros"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 
 [[package]]
 name = "gl_generator"
@@ -44,7 +44,7 @@ version = "0.0.1"
 source = "git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8"
 dependencies = [
  "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034ecf95e8)",
- "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571a2b36f6a)",
+ "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#3a3f37e7014e591394329790565d63d6743c6901)",
 ]
 
 [[package]]
@@ -56,21 +56,21 @@ source = "git+https://github.com/bjz/gl-rs.git#8bf7197ac6769a208d6bdc30070958034
 name = "render"
 version = "0.1.0"
 dependencies = [
- "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#eaba57188671e80b3b21c193c52028642328bab0)",
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#e54265cb611c1e585533b21ff3e3c293e7b5bd61)",
  "ecs 0.1.0",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
 ]
 
 [[package]]
 name = "render"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678"
+source = "git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#b33dedb6b65cb1f4fc98aaf6fc175f8bca08e678)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#34b44588df924299c19fc9a007c444299df994ec)",
 ]
 
 [[package]]
 name = "rust-xml"
 version = "0.1.0"
-source = "git+https://github.com/netvl/rust-xml#361fc1ac28422186a97b377ad9c1d571a2b36f6a"
+source = "git+https://github.com/netvl/rust-xml#3a3f37e7014e591394329790565d63d6743c6901"
 
