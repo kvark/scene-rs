@@ -6,28 +6,27 @@ extern crate cgmath;
 extern crate ecs;
 extern crate gfx;
 
-use std::{iter, slice};
+use std::{iter, num, slice};
+use cgmath::Transform;
 
-// normalized depth
-pub type Depth = u16;
+pub type Depth = u32;
 
 pub type Scalar = f32;
 
-pub type Transform = cgmath::Decomposed<
+pub type Space = cgmath::Decomposed<
     Scalar,
-    cgmath::Quaternion<Scalar>,
-    cgmath::Point3<Scalar>
+    cgmath::Vector3<Scalar>,
+    cgmath::Quaternion<Scalar>
 >;
 
 struct Camera {
-    transform: Transform,
+    space: Space,
     frustum: cgmath::Frustum<Scalar>,
 }
 
 pub struct Object<L, T> {
     batch: gfx::batch::RefBatch<L, T>,
-    data: T,
-    bounding_sphere: cgmath::Sphere<Scalar>,
+    parameters: T,
     depth: Depth,
 }
 
@@ -40,7 +39,6 @@ type Index = uint;
 pub struct Queue<L, T> {
     pub objects: Vec<Object<L, T>>,
     indices: Vec<Index>,
-    context: gfx::batch::Context,
 }
 
 struct ObjectIter<'a, L: 'a, T: 'a> {
@@ -73,7 +71,7 @@ impl<L, T: gfx::shade::ShaderParam<L>> Queue<L, T> {
 
     /// Sort objects with the given order
     pub fn sort(&mut self, order: |&Object<L, T>, &Object<L, T>| -> Ordering) {
-        debug_assert!(self.is_updated());
+        self.update();
         let objects = self.objects.as_slice();
         self.indices.sort_by(|&ia, &ib|
             (order)(&objects[ia], &objects[ib])
@@ -88,27 +86,39 @@ impl<L, T: gfx::shade::ShaderParam<L>> Queue<L, T> {
             id_iter: self.indices.iter(),
         }
     }
-
-    // render everything to the given frame
-    pub fn render<C: gfx::CommandBuffer>(&self, renderer: &mut gfx::Renderer<C>,
-                  frame: &gfx::Frame) {
-        debug_assert!(self.is_updated());
-        for &i in self.indices.iter() {
-            let ob = &self.objects[i];
-            renderer.draw((&ob.batch, &ob.data, &self.context), frame);
-        }
-    }
 }
 
 pub struct View<L, T> {
     pub frame: gfx::Frame,
     pub camera: Camera,
-    pub queue: Queue<L, T>,
+    queue: Queue<L, T>,
 }
 
-impl<L, T> View<L, T> {
-    fn add(&mut self, batch: gfx::batch::RefBatch<L, T>, bound: cgmath::Sphere<Scalar>) {
-        let _depth = 0u;
-        //self.queue.objects.push(Object {})
+impl<L, T: gfx::shade::ShaderParam<L>> View<L, T> {
+    pub fn clear(&mut self) {
+        self.queue.objects.clear()
+    }
+
+    pub fn add(&mut self, batch: gfx::batch::RefBatch<L, T>, data: T,
+           world: &Space, _bound: cgmath::Sphere<Scalar>) {
+        let view = self.camera.space.concat(world);
+        let frustum = &self.camera.frustum;
+        let depth_max: Depth = num::Bounded::max_value();
+        let depth = (depth_max as f32 * (view.disp.z - frustum.near.d) /
+            (frustum.far.d - frustum.near.d)) as Depth;
+        //TODO: cull based on `bound`
+        self.queue.objects.push(Object {
+            batch: batch,
+            parameters: data,
+            depth: depth,
+        });
+    }
+
+    pub fn render<'a, C: gfx::CommandBuffer>(&'a mut self, renderer: &mut gfx::Renderer<C>,
+                  context: &'a gfx::batch::Context) {
+        self.queue.sort(order_opaque);
+        for ob in self.queue.objects() {
+            renderer.draw((&ob.batch, &ob.parameters, context), &self.frame);
+        }
     }
 }
