@@ -1,5 +1,6 @@
 use std::rand::{Rng, StdRng};
 use cgmath::{Angle, Deg, Rad, ToRad, Point, Point2, Vector, sin, cos};
+use ecs;
 use world as w;
 
 static KINDS: uint = 2;
@@ -9,20 +10,20 @@ pub struct System {
     spawn_radius: f32,
     rate: f32,
     time_left: w::Delta,
-    draw: w::Drawable,
+    draw_id: ecs::Id<w::Drawable>,
     pools: [Vec<w::Entity>, ..KINDS],
     rng: StdRng,
 }
 
 impl System {
-    pub fn new(extents: [f32, ..2], draw: w::Drawable) -> System {
+    pub fn new(extents: [f32, ..2], draw_id: ecs::Id<w::Drawable>) -> System {
         let radius = extents[0] + extents[1];
         System {
             screen_ext: extents,
             spawn_radius: radius,
             rate: 1.0,
             time_left: 3.0,
-            draw: draw,
+            draw_id: draw_id,
             pools: [Vec::new(), Vec::new()],
             rng: StdRng::new().unwrap(),
         }
@@ -64,13 +65,14 @@ impl System {
                 ent
             },
             None => {
-                data.add()
+                let mut ent = data.add()
                     .space(space)
                     .inertia(inertia)
-                    .draw(self.draw.clone())
                     .aster(aster)
                     .collision(collide)
-                    .entity
+                    .entity;
+                ent.draw = Some(self.draw_id);
+                ent
             },
         }
     }

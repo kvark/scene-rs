@@ -22,33 +22,26 @@ struct Camera {
 	frustum: cgmath::Frustum<Scalar>,
 }
 
-pub struct Context {
-	pub meshes: ecs::Array<gfx::Mesh>,
-	pub states: ecs::Array<gfx::DrawState>,
-}
-
-pub struct Object {
-	mesh_id: ecs::Id<gfx::Mesh>,
-	slice: gfx::Slice,
-	state_id: ecs::Id<gfx::DrawState>,
-	program: gfx::shade::DictionaryProgram,
+pub struct Object<L, T> {
+	batch: gfx::batch::RefBatch<L, T>,
     bounding_sphere: cgmath::Sphere<Scalar>,
 	depth: Depth,
 }
 
-pub fn order_opaque(a: &Object, b: &Object) -> Ordering {
-    a.mesh_id.cmp(&b.mesh_id)
+pub fn order_opaque<L, T>(a: &Object<L, T>, b: &Object<L, T>) -> Ordering {
+    Equal
 }
 
 type Index = uint;
 
-pub struct Queue {
-    pub objects: Vec<Object>,
+pub struct Queue<L, T> {
+    pub objects: Vec<Object<L, T>>,
     indices: Vec<Index>,
+	context: gfx::batch::Context,
 }
 
-impl Queue {
-    fn update(&mut self, order: |&Object, &Object| -> Ordering) {
+impl<L, T> Queue<L, T> {
+    fn update(&mut self, order: |&Object<L, T>, &Object<L, T>| -> Ordering) {
         // synchronize indices to have the same length
         let ni = self.indices.len();
         if self.objects.len() > ni {
@@ -67,15 +60,14 @@ impl Queue {
     }
 }
 
-pub struct View {
+pub struct View<L, T> {
     pub frame: gfx::Frame,
     pub camera: Camera,
-	pub queue: Queue,
+	pub queue: Queue<L, T>,
 }
 
-impl View {
-	fn add(&mut self, mesh: &gfx::Mesh, slice: gfx::Slice, state: &gfx::DrawState,
-		program: gfx::shade::DictionaryProgram, bound: cgmath::Sphere<Scalar>) {
+impl<L, T> View<L, T> {
+	fn add(&mut self, batch: gfx::batch::RefBatch<L, T>, bound: cgmath::Sphere<Scalar>) {
 		let _depth = 0u;
 		//self.queue.objects.push(Object {})
 	}

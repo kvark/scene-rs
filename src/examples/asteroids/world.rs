@@ -7,9 +7,9 @@ use gfx;
 use ecs;
 
 pub type Delta = f32;
-pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::Renderer);
+pub type Params<'a, 'b> = &'a mut (Delta, &'b mut gfx::Renderer<gfx::GlCommandBuffer>);
 
-#[shader_param(Program)]
+#[shader_param(Batch)]
 pub struct ShaderParam {
     //TODO: hide these
     pub transform: [f32, ..4],
@@ -19,12 +19,7 @@ pub struct ShaderParam {
 /// --- Components ---
 
 #[deriving(Clone)]
-pub struct Drawable {
-    pub program: Program,
-    pub mesh_id: ecs::Id<gfx::Mesh>,
-    pub state_id: ecs::Id<gfx::DrawState>,
-    pub slice: gfx::Slice,
-}
+pub type Drawable = Batch;
 
 #[deriving(Clone)]
 pub struct Spatial {

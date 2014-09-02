@@ -11,20 +11,21 @@ pub struct System {
     shoot: bool,
     ship_space_id: ecs::Id<w::Spatial>,
     ship_inertia_id: ecs::Id<w::Inertial>,
-    draw: w::Drawable,
+    draw_id: ecs::Id<w::Drawable>,
     cool_time: f32,
     pool: Vec<w::Entity>,
 }
 
 impl System {
     pub fn new(chan: Receiver<Event>, space_id: ecs::Id<w::Spatial>,
-               inertia_id: ecs::Id<w::Inertial>, draw: w::Drawable) -> System {
+               inertia_id: ecs::Id<w::Inertial>, draw_id: ecs::Id<w::Drawable>)
+               -> System {
         System {
             input: chan,
             shoot: false,
             ship_space_id: space_id,
             ship_inertia_id: inertia_id,
-            draw: draw,
+            draw_id: draw_id,
             cool_time: 1.0,
             pool: Vec::new(),
         }
@@ -77,13 +78,14 @@ impl w::System for System {
                     ent
                 },
                 None => {
-                    data.add()
+                    let mut ent = data.add()
                         .space(space)
                         .inertia(inertia)
-                        .draw(self.draw.clone())
                         .bullet(bullet)
                         .collision(collide)
-                        .entity
+                        .entity;
+                    ent.draw = Some(self.draw_id);
+                    ent
                 },
             };
             entities.push(ent);

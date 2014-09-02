@@ -2,7 +2,7 @@ extern crate time;
 
 use cgmath::{Rad, Point2, Vector2};
 use gfx;
-use gfx::DeviceHelper;
+use gfx::{DeviceHelper, ToSlice};
 use event;
 use sys;
 use world;
@@ -31,7 +31,8 @@ pub struct Game {
 }
 
 impl Game {
-    fn create_program<D: gfx::Device>(device: &mut D) -> world::Program {
+    fn create_program<C: gfx::CommandBuffer, D: gfx::Device<C>>(device: &mut D)
+                      -> gfx::ProgramHandle {
         device.link_program(
             shaders! {
             GLSL_150: b"
@@ -60,24 +61,20 @@ impl Game {
         ).unwrap()
     }
 
-    fn create_ship<D: gfx::Device>(device: &mut D, data: &mut world::Components,
-                   draw: &mut sys::draw::System, program: world::Program)
-                   -> world::Entity {
+    fn create_ship<C: gfx::CommandBuffer, D: gfx::Device<C>>(device: &mut D,
+                   data: &mut world::Components, draw: &mut sys::draw::System,
+                   program: gfx::ProgramHandle) -> world::Entity {
         let mesh = device.create_mesh(vec![
             Vertex::new(-0.3, -0.5, 0x20C02000),
             Vertex::new(0.3, -0.5,  0x20C02000),
             Vertex::new(0.0, 0.5,   0xC0404000),
         ]);
-        let slice = mesh.get_slice(gfx::TriangleList);
+        let slice = mesh.to_slice(gfx::TriangleList);
         let mut state = gfx::DrawState::new();
         state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
+        let batch = draw.context.batch(&mesh, slice, &program, &state).unwrap();
         data.add()
-            .draw(world::Drawable {
-                program: program,
-                mesh_id: draw.meshes.add(mesh),
-                state_id: draw.states.add(state),
-                slice: slice,
-            })
+            .draw(batch)
             .space(world::Spatial {
                 pos: Point2::new(0.0, 0.0),
                 orient: Rad{ s: 0.0 },
@@ -99,42 +96,34 @@ impl Game {
             .entity
     }
 
-    pub fn new<D: gfx::Device>(frame: gfx::Frame,
+    pub fn new<C: gfx::CommandBuffer, D: gfx::Device<C>>(frame: gfx::Frame,
                (ev_control, ev_bullet): event::ReceiverHub, device: &mut D) -> Game {
         let mut w = world::World::new();
         // prepare systems
         let program = Game::create_program(device);
         let mut draw_system = sys::draw::System::new(SCREEN_EXTENTS, frame);
-        let bullet_draw = {
+        let bullet_draw_id = {
             let mesh = device.create_mesh(vec![
                 Vertex::new(0.0, 0.0, 0xFF808000),
             ]);
-            let slice = mesh.get_slice(gfx::Point);
+            let slice = mesh.to_slice(gfx::Point);
             let mut state = gfx::DrawState::new();
             state.primitive.method = gfx::state::Point;
-            world::Drawable {
-                program: program.clone(),
-                mesh_id: draw_system.meshes.add(mesh),
-                state_id: draw_system.states.add(state),
-                slice: slice,
-            }
+            let batch = draw_system.context.batch(&mesh, slice, &program, &state).unwrap();
+            w.data.draw.add(batch)
         };
-        let aster_draw = {
+        let aster_draw_id = {
             let mesh = device.create_mesh(vec![
                 Vertex::new(-0.5, -0.5, 0xFFFFFF00),
                 Vertex::new(0.5, -0.5,  0xFFFFFF00),
                 Vertex::new(-0.5, 0.5,  0xFFFFFF00),
                 Vertex::new(0.5, 0.5,   0xFFFFFF00),
             ]);
-            let slice = mesh.get_slice(gfx::TriangleStrip);
+            let slice = mesh.to_slice(gfx::TriangleStrip);
             let mut state = gfx::DrawState::new();
             state.primitive.method = gfx::state::Fill(gfx::state::CullNothing);
-            world::Drawable {
-                program: program.clone(),
-                mesh_id: draw_system.meshes.add(mesh),
-                state_id: draw_system.states.add(state),
-                slice: slice,
-            }
+            let batch = draw_system.context.batch(&mesh, slice, &program, &state).unwrap();
+            w.data.draw.add(batch)
         };
         let ship = Game::create_ship(device, &mut w.data, &mut draw_system, program);
         let (space_id, inertia_id) = (ship.space.unwrap(), ship.inertia.unwrap());
@@ -145,8 +134,8 @@ impl Game {
             box sys::inertia::System,
             box sys::control::System::new(ev_control),
             box sys::bullet::System::new(ev_bullet,
-                space_id, inertia_id, bullet_draw),
-            box sys::aster::System::new(SCREEN_EXTENTS, aster_draw),
+                space_id, inertia_id, bullet_draw_id),
+            box sys::aster::System::new(SCREEN_EXTENTS, aster_draw_id),
             box sys::physics::System::new(),
         ]);
         Game {
@@ -155,7 +144,7 @@ impl Game {
         }
     }
 
-    pub fn render(&mut self, renderer: &mut gfx::Renderer) {
+    pub fn render(&mut self, renderer: &mut gfx::Renderer<gfx::GlCommandBuffer>) {
         let new_time = time::precise_time_ns();
         let delta = (new_time - self.last_time) as f32 / 1e9;
         self.last_time = new_time;

@@ -1,12 +1,10 @@
 use gfx;
-use ecs;
 use world as w;
 
 pub struct System {
     extents: [f32, ..2],
     pub frame: gfx::Frame,
-    pub meshes: ecs::Array<gfx::Mesh>,
-    pub states: ecs::Array<gfx::DrawState>,
+    pub context: gfx::batch::Context,
 }
 
 impl System {
@@ -14,17 +12,8 @@ impl System {
         System {
             extents: extents,
             frame: frame,
-            meshes: ecs::Array::new(),
-            states: ecs::Array::new(),
+            context: gfx::batch::Context::new(),
         }
-    }
-
-    fn render<'a>(&mut self, renderer: &mut gfx::Renderer, drawable: &'a w::Drawable,
-              param: &'a w::ShaderParam) {
-        let mesh = self.meshes.get(drawable.mesh_id);
-        let state = self.states.get(drawable.state_id);
-        renderer.draw(mesh, drawable.slice, &self.frame,
-            (&drawable.program, param), state).unwrap();
     }
 }
 
@@ -43,7 +32,7 @@ impl w::System for System {
         };
         for ent in entities.iter() {
             ent.draw.map(|d_id| {
-                let drawable = data.draw.get_mut(d_id);
+                let drawable = data.draw.get(d_id);
                 match ent.space {
                     Some(s_id) => {
                         let s = data.space.get(s_id);
@@ -51,7 +40,7 @@ impl w::System for System {
                     }
                     None => ()
                 }
-                self.render(*renderer, drawable, &param)
+                renderer.draw((drawable, &param, &self.context), &self.frame);
             });
         }
     }

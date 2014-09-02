@@ -23,7 +23,10 @@ mod sys {
     pub mod physics;
 }
 
-fn game_loop(mut game: game::Game, ren_recv: Receiver<gfx::Renderer>, ren_end: Sender<gfx::Renderer>) {
+type Renderer = gfx::Renderer<gfx::GlCommandBuffer>;
+
+fn game_loop(mut game: game::Game, ren_recv: Receiver<Renderer>,
+             ren_end: Sender<Renderer>) {
     while game.is_alive() {
         let mut renderer = match ren_recv.recv_opt() {
             Ok(r) => r,
