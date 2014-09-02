@@ -1,16 +1,16 @@
-.PHONY: all lib examples update run
+.PHONY: all lib aster update run
 
-all: lib examples
+all: lib aster
 
 lib:
 	cargo build
 
-examples:
-	(cd src/examples/asteroids && cargo build)
+aster:
+	(cd examples/asteroids && cargo build)
 
 update:
 	cargo update
-	(cd src/examples/asteroids && cargo update)
+	(cd examples/asteroids && cargo update)
 
-run: examples
-	src/examples/asteroids/target/asteroids
+run: aster
+	examples/asteroids/target/asteroids

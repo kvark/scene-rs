@@ -11,7 +11,7 @@ name = "asteroids"
 path = "main.rs"
 
 [dependencies.scene]
-path = "../../.."
+path = "../.."
 
 [dependencies.cgmath]
 git = "https://github.com/bjz/cgmath-rs"
