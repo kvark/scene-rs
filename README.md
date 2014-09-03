@@ -3,10 +3,11 @@ Scene-rs
 [![Build Status](https://travis-ci.org/kvark/scene-rs.png?branch=master)](https://travis-ci.org/kvark/scene-rs)
 
 ### Research directions:
-* Entity-Component Systems (_in progress_)
 * Render Queues
-* Scene Graphs
+* Entity-Component Systems
+* File Loaders
 * Spatial Partitioning
+* Scene Graphs
 
 ### Goals:
 * ability to compose a scene from the code
@@ -14,4 +15,4 @@ Scene-rs
 * having a Blender exporter into the scene format
 * ability to load a scene and render it
 * playing animations (skeletal at the very least)
-* sorting and cull draw calls
+* sorting and culling draw calls

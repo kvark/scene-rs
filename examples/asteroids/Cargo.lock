@@ -81,6 +81,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "gltf"
+version = "0.1.0"
+dependencies = [
+ "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9ec516616)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#c21e18df341974fbdb246d19535b535e2570071e)",
+]
+
+[[package]]
 name = "khronos_api"
 version = "0.0.1"
 source = "git+https://github.com/bjz/gl-rs.git#8f454e6163ffbc37b542d4ce29d925df74954415"
@@ -117,6 +125,7 @@ name = "scene"
 version = "0.1.0"
 dependencies = [
  "ecs 0.1.0",
+ "gltf 0.1.0",
  "render 0.1.0",
 ]
 
