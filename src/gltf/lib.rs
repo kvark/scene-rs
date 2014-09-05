@@ -1,10 +1,13 @@
 //! GLTF package loader for gfx-rs
 
 #![crate_name = "gltf"]
+#![feature(phase)]
 
 extern crate serialize;
 extern crate cgmath;
 extern crate gfx;
+#[phase(plugin)]
+extern crate gfx_macros;
 
 use serialize::{json, Decoder, Decodable};
 use std::cmp;
@@ -65,7 +68,8 @@ pub struct SubMesh {
 pub struct Package {
     pub buffers: HashMap<String, gfx::RawBufferHandle>,
     pub attributes: HashMap<String, (gfx::Attribute, uint)>,
-    pub models: HashMap<String, (String, Vec<SubMesh>)>,
+    pub models: HashMap<String, Vec<SubMesh>>,
+    pub shaders: HashMap<String, gfx::ShaderHandle>,
 }
 
 impl Package {
@@ -86,7 +90,7 @@ impl Package {
                 buffer: *buffers.find(&a.bufferView).unwrap(),
                 format: gfx::attrib::Format {
                     elem_count: 1, //TODO
-                    elem_type: gfx::attrib::Special, //TODO
+                    elem_type: gfx::attrib::Special, //TODO s.type
                     offset: a.byteOffset as gfx::attrib::Offset,
                     stride: a.byteStride as gfx::attrib::Stride,
                     instance_rate: 0,
@@ -95,7 +99,7 @@ impl Package {
         });
         let models = load_map(&json, "meshes", |m: types::Mesh| {
             //(m.name.clone(), gfx::Mesh::new(10), gfx::VertexSlice(gfx::Point, 0, 0))
-            let sub_meshes = m.primitives.iter().map(|prim| SubMesh {
+            m.primitives.iter().map(|prim| SubMesh {
                 mesh: gfx::Mesh {
                     num_vertices: prim.attributes.values().fold(-1u, |min, id| {
                         let &(_, count) = attributes.find(id).unwrap();
@@ -110,13 +114,22 @@ impl Package {
                 slice: attrib_to_slice(attributes.find(&prim.indices)
                     .unwrap().ref0()).unwrap(),
                 material: prim.material.clone(),
-            }).collect();
-            (m.name.clone(), sub_meshes)
+            }).collect()
+        });
+        let shaders = load_map(&json, "shaders", |s: types::Shader| {
+            let kind = gfx::shade::Vertex; //TODO s.type
+            let data = File::open(&Path::new(s.uri)).read_to_end().unwrap();
+            let source = gfx::ShaderSource {
+                glsl_120: None,
+                glsl_150: Some(gfx::OwnedBytes(data)),
+            };
+            device.create_shader(kind, source).unwrap()
         });
         Ok(Package {
             buffers: buffers,
             attributes: attributes,
             models: models,
+            shaders: shaders,
         })
     }
 }

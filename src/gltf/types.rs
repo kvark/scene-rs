@@ -34,3 +34,10 @@ pub struct Mesh {
     pub name: String,
     pub primitives: Vec<Primitive>,
 }
+
+#[deriving(Decodable)]
+pub struct Shader {
+    pub name: String,
+    pub uri: String,
+    //pub type: String,
+}
