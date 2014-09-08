@@ -8,21 +8,23 @@ extern crate cgmath;
 extern crate gfx;
 #[phase(plugin)]
 extern crate gfx_macros;
+extern crate serde;
+#[phase(plugin)]
+extern crate serde_macros;
 
-use serialize::{json, Decoder, Decodable};
 use std::cmp;
 use std::collections::HashMap;
-use std::from_str::FromStr;
 use std::io::File;
+use serde::{de, json};
 
 mod types;
 
-fn load_map<T: Decodable<json::Decoder, json::DecoderError>, R>(json: &json::Json,
-            var: &str, fun: |T| -> R) -> HashMap<String, R> {
+fn load_map<T: de::Deserializable<json::JsonDeserializer, json::ParserError>, R>(
+            json: &json::Json, var: &str, fun: |T| -> R) -> HashMap<String, R> {
     match json.find(&var.to_string()) {
         Some(&json::Object(ref map)) => map.iter().map(|(id, sub)| {
-            let b: T = Decodable::decode(&mut json::Decoder::new(sub.clone())).unwrap();
-            (id.clone(), fun(b))
+            let v: T = json::from_json(sub.clone()).unwrap();
+            (id.clone(), fun(v))
         }).collect(),
         _ => HashMap::new(),
     }
@@ -75,9 +77,9 @@ pub struct Package {
 impl Package {
     fn load<C: gfx::CommandBuffer, D: gfx::Device<C>>(input: &str, device: &mut D)
             -> Result<Package, LoadError> {
-        let json: json::Json = match FromStr::from_str(input) {
-            Some(j) => j,
-            None => return Err(ErrorString),
+        let json = match json::from_str(input) {
+            Ok(j) => j,
+            Err(_e) => return Err(ErrorString),
         };
         let buffers = load_map(&json, "buffers", |b: types::Buffer| {
             let data = File::open(&Path::new(b.uri)).read_to_end().unwrap();
