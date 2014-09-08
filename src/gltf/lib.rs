@@ -77,6 +77,17 @@ fn parse_accessor_type(ty: &str) -> Result<(gfx::attrib::Count,
     }
 }
 
+#[deriving(Clone, PartialEq, Show)]
+pub struct ShaderError(uint);
+
+fn parse_shader_type(ty: uint) -> Result<gfx::shade::Stage, ShaderError> {
+    match ty {
+        35633 => Ok(gfx::shade::Vertex),
+        35632 => Ok(gfx::shade::Fragment),
+        _ => Err(ShaderError(ty)),
+    }
+}
+
 pub enum LoadError {
     ErrorString,
     ErrorJson,
@@ -141,13 +152,13 @@ impl Package {
             }).collect()
         });
         let shaders = load_map(&json, "shaders", |s: types::Shader| {
-            let kind = gfx::shade::Vertex; //TODO s.type
+            let stage = parse_shader_type(s.ty).unwrap();
             let data = File::open(&Path::new(s.uri)).read_to_end().unwrap();
             let source = gfx::ShaderSource {
                 glsl_120: None,
                 glsl_150: Some(gfx::OwnedBytes(data)),
             };
-            device.create_shader(kind, source).unwrap()
+            device.create_shader(stage, source).unwrap()
         });
         Ok(Package {
             buffers: buffers,
