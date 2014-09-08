@@ -94,9 +94,9 @@ pub enum LoadError {
 }
 
 pub struct SubMesh {
-    mesh: gfx::Mesh,
-    slice: gfx::Slice,
-    material: String,
+    pub mesh: gfx::Mesh,
+    pub slice: gfx::Slice,
+    pub material: String,
 }
 
 pub struct Package {
@@ -104,10 +104,11 @@ pub struct Package {
     pub attributes: HashMap<String, (gfx::Attribute, uint)>,
     pub models: HashMap<String, Vec<SubMesh>>,
     pub shaders: HashMap<String, gfx::ShaderHandle>,
+    pub programs: HashMap<String, gfx::ProgramHandle>,
 }
 
 impl Package {
-    fn load<C: gfx::CommandBuffer, D: gfx::Device<C>>(input: &str, device: &mut D)
+    pub fn load<C: gfx::CommandBuffer, D: gfx::Device<C>>(input: &str, device: &mut D)
             -> Result<Package, LoadError> {
         let json = match json::from_str(input) {
             Ok(j) => j,
@@ -115,28 +116,27 @@ impl Package {
         };
         let buffers = load_map(&json, "buffers", |b: types::Buffer| {
             let data = File::open(&Path::new(b.uri)).read_to_end().unwrap();
-            debug_assert_eq!(data.len(), b.byteLength);
+            debug_assert_eq!(data.len(), b.byte_length);
             device.create_buffer_static(&data).raw()
         });
         let attributes = load_map(&json, "accessors", |a: types::Accessor| {
             let (el_count, el_ty) = parse_accessor_type(a.ty.as_slice()).unwrap();
             (gfx::Attribute {
                 name: a.name,
-                buffer: *buffers.find(&a.bufferView).unwrap(),
+                buffer: *buffers.find(&a.buffer_view).unwrap(),
                 format: gfx::attrib::Format {
                     elem_count: el_count,
                     elem_type: el_ty,
-                    offset: a.byteOffset as gfx::attrib::Offset,
-                    stride: a.byteStride as gfx::attrib::Stride,
+                    offset: a.byte_offset as gfx::attrib::Offset,
+                    stride: a.byte_stride as gfx::attrib::Stride,
                     instance_rate: 0,
                 },
             }, a.count)
         });
         let models = load_map(&json, "meshes", |m: types::Mesh| {
-            //(m.name.clone(), gfx::Mesh::new(10), gfx::VertexSlice(gfx::Point, 0, 0))
             m.primitives.iter().map(|prim| SubMesh {
                 mesh: gfx::Mesh {
-                    num_vertices: prim.attributes.values().fold(-1u, |min, id| {
+                    num_vertices: prim.attributes.values().fold(0xFFFFFFFF, |min, id| {
                         let &(_, count) = attributes.find(id).unwrap();
                         cmp::min(min, count)
                     }) as gfx::VertexCount,
@@ -160,11 +160,19 @@ impl Package {
             };
             device.create_shader(stage, source).unwrap()
         });
+        let programs = load_map(&json, "programs", |p: types::Program| {
+            let vs = shaders.find(&p.vertex_shader).unwrap().clone();
+            assert_eq!(*vs.get_info(), gfx::shade::Vertex);
+            let fs = shaders.find(&p.fragment_shader).unwrap().clone();
+            assert_eq!(*fs.get_info(), gfx::shade::Fragment);
+            device.create_program([vs, fs].as_slice()).unwrap()
+        });
         Ok(Package {
             buffers: buffers,
             attributes: attributes,
             models: models,
             shaders: shaders,
+            programs: programs,
         })
     }
 }

@@ -1,10 +1,10 @@
-use serde::de;
 use std::collections::TreeMap;
 
 #[deriving_deserializable]
 pub struct Buffer {
     pub uri: String,
-    pub byteLength: uint,
+    #[serial_name = "byteLength"]
+    pub byte_length: uint,
     pub name: String,
     #[serial_name = "type"]
     pub ty: String,
@@ -12,10 +12,14 @@ pub struct Buffer {
 
 #[deriving_deserializable]
 pub struct Accessor {
-    pub bufferView: String,
-    pub byteOffset: uint,
-    pub byteStride: uint,
-    pub componentType: uint,
+    #[serial_name = "bufferView"]
+    pub buffer_view: String,
+    #[serial_name = "byteOffset"]
+    pub byte_offset: uint,
+    #[serial_name = "byteStride"]
+    pub byte_stride: uint,
+    #[serial_name = "componentType"]
+    pub component_type: uint,
     pub count: uint,
     #[serial_name = "type"]
     pub ty: String,
@@ -44,4 +48,14 @@ pub struct Shader {
     pub uri: String,
     #[serial_name = "type"]
     pub ty: uint,
+}
+
+#[deriving_deserializable]
+pub struct Program {
+    pub name: String,
+    pub attributes: Vec<String>,
+    #[serial_name = "vertexShader"]
+    pub vertex_shader: String,
+    #[serial_name = "fragmentShader"]
+    pub fragment_shader: String,
 }

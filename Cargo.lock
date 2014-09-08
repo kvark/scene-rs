@@ -15,7 +15,7 @@ source = "git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9e
 [[package]]
 name = "device"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d"
+source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
 dependencies = [
  "gfx_gl 0.1.0 (git+https://github.com/gfx-rs/gfx_gl.git#52bb510e9e76cd3c0aed7b6aa678c03059d630a6)",
 ]
@@ -27,11 +27,11 @@ version = "0.1.0"
 [[package]]
 name = "gfx"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d"
+source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d)",
- "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d)",
- "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
 ]
 
 [[package]]
@@ -45,7 +45,7 @@ dependencies = [
 [[package]]
 name = "gfx_macros"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d"
+source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
 
 [[package]]
 name = "gl_generator"
@@ -61,7 +61,7 @@ name = "gltf"
 version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9ec516616)",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
  "serde 0.1.0 (git+https://github.com/erickt/rust-serde#906e9db9d5500bdb1fa3255da788b28ef73126cb)",
 ]
 
@@ -76,15 +76,15 @@ version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9ec516616)",
  "ecs 0.1.0",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
 ]
 
 [[package]]
 name = "render"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d"
+source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#af5a4edac527cbab030413d064667f0a4b91bd0d)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
 ]
 
 [[package]]
