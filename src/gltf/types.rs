@@ -1,21 +1,13 @@
 use serde::de;
 use std::collections::TreeMap;
 
-/*pub struct Type(pub uint);
-
-impl<D: de::Deserializer<E>, E> de::Deserializable<D, E> for Type {
-    #[inline]
-    fn deserialize_token(d: &mut D, token: de::Token) -> Result<Type, E> {
-        let val =
-    }
-}*/
-
 #[deriving_deserializable]
 pub struct Buffer {
     pub uri: String,
     pub byteLength: uint,
     pub name: String,
-    //pub type: String,
+    #[serial_name = "type"]
+    pub ty: String,
 }
 
 #[deriving_deserializable]
@@ -25,7 +17,8 @@ pub struct Accessor {
     pub byteStride: uint,
     pub componentType: uint,
     pub count: uint,
-    //pub type: uint,
+    #[serial_name = "type"]
+    pub ty: String,
     pub name: String,
     pub max: (f32, f32, f32),
     pub min: (f32, f32, f32),
@@ -49,5 +42,6 @@ pub struct Mesh {
 pub struct Shader {
     pub name: String,
     pub uri: String,
-    //pub type: uint,
+    #[serial_name = "type"]
+    pub ty: uint,
 }

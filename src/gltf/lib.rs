@@ -56,6 +56,27 @@ fn attrib_to_slice(attrib: &gfx::Attribute)
     }
 }
 
+#[deriving(Clone, PartialEq, Show)]
+pub enum AccessorError {
+    AccessorMatrix(u8),
+    AccessorUnknown(String),
+}
+
+fn parse_accessor_type(ty: &str) -> Result<(gfx::attrib::Count,
+                       gfx::attrib::Type), AccessorError> {
+    use gfx::attrib as a;
+    match ty {
+        "SCALAR" => Ok((1, a::Float(a::FloatDefault, a::F32))),
+        "VEC2"   => Ok((2, a::Float(a::FloatDefault, a::F32))),
+        "VEC3"   => Ok((3, a::Float(a::FloatDefault, a::F32))),
+        "VEC4"   => Ok((4, a::Float(a::FloatDefault, a::F32))),
+        "MAT2"   => Err(AccessorMatrix(2)),
+        "MAT3"   => Err(AccessorMatrix(3)),
+        "MAT4"   => Err(AccessorMatrix(4)),
+        _        => Err(AccessorUnknown(ty.to_string())),
+    }
+}
+
 pub enum LoadError {
     ErrorString,
     ErrorJson,
@@ -87,12 +108,13 @@ impl Package {
             device.create_buffer_static(&data).raw()
         });
         let attributes = load_map(&json, "accessors", |a: types::Accessor| {
+            let (el_count, el_ty) = parse_accessor_type(a.ty.as_slice()).unwrap();
             (gfx::Attribute {
                 name: a.name,
                 buffer: *buffers.find(&a.bufferView).unwrap(),
                 format: gfx::attrib::Format {
-                    elem_count: 1, //TODO
-                    elem_type: gfx::attrib::Special, //TODO s.type
+                    elem_count: el_count,
+                    elem_type: el_ty,
                     offset: a.byteOffset as gfx::attrib::Offset,
                     stride: a.byteStride as gfx::attrib::Stride,
                     instance_rate: 0,
