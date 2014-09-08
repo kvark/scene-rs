@@ -59,3 +59,68 @@ pub struct Program {
     #[serial_name = "fragmentShader"]
     pub fragment_shader: String,
 }
+
+#[deriving_deserializable]
+pub struct TechniqueParameter {
+    #[serial_name = "type"]
+    pub ty: uint,
+    pub semantic: String,   //optional
+    pub node: String,       //optional
+    pub value: Vec<f32>,    //optional
+}
+
+#[deriving_deserializable]
+pub struct InstanceProgram {
+    pub attributes: TreeMap<String, String>,
+    pub program: String,
+    pub uniforms: TreeMap<String, String>,
+}
+
+#[deriving_deserializable]
+pub struct StateFunctions {
+    #[serial_name = "blendColor"]
+    pub blend_color: (f32, f32, f32, f32),
+    #[serial_name = "blendEquationSeparate"]
+    pub blend_equation_separate: (uint, uint),
+    #[serial_name = "blendFuncSeparate"]
+    pub blend_func_separate: (uint, uint, uint, uint),
+    #[serial_name = "colorMask"]
+    pub color_mask: (bool, bool, bool, bool),
+    #[serial_name = "cullFace"]
+    pub cull_face: (uint, ),
+    #[serial_name = "depthFunc"]
+    pub depth_func: (uint, ),
+    #[serial_name = "depthMask"]
+    pub depth_mask: (bool, ),
+    #[serial_name = "depthRange"]
+    pub depth_range: (f32, f32),
+    #[serial_name = "frontFace"]
+    pub front_face: (uint, ),
+    #[serial_name = "lineWidth"]
+    pub line_width: (f32, ),
+    #[serial_name = "polygonOffset"]
+    pub polygon_offset: (f32, f32),
+    pub scissor: (f32, f32, f32, f32),
+}
+
+#[deriving_deserializable]
+pub struct States {
+    pub enable: Vec<uint>,
+    pub functions: StateFunctions,
+}
+
+#[deriving_deserializable]
+pub struct Pass {
+    pub details: (),
+    #[serial_name = "instanceProgram"]
+    pub instance_program: InstanceProgram,
+    pub states: States,
+}
+
+#[deriving_deserializable]
+pub struct Technique {
+    pub name: String,
+    pub parameters: TreeMap<String, TechniqueParameter>,
+    pub pass: String,
+    pub passes: TreeMap<String, Pass>,
+}
