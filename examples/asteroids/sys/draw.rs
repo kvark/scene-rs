@@ -21,11 +21,11 @@ impl w::System for System {
     fn process(&mut self, &(_, ref mut renderer): w::Params, data: &mut w::Components,
                entities: &mut Vec<w::Entity>) {
         let clear_data = gfx::ClearData {
-            color: Some([0.0, 0.0, 0.1, 0.0]),
-            depth: None,
-            stencil: None,
+            color: [0.0, 0.0, 0.1, 0.0],
+            depth: 1.0,
+            stencil: 0,
         };
-        renderer.clear(clear_data, &self.frame);
+        renderer.clear(clear_data, gfx::Color, &self.frame);
         let mut param = w::ShaderParam {
             transform: [0.0, 0.0, 0.0, 1.0],
             screen_scale: [1.0 / self.extents[0], 1.0 / self.extents[1], 0.0, 0.0],
