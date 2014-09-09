@@ -1,4 +1,6 @@
 use std::collections::TreeMap;
+use gfx;
+use gfx_gl::types::GLenum;
 
 #[deriving_deserializable]
 pub struct Buffer {
@@ -15,12 +17,12 @@ pub struct Accessor {
     #[serial_name = "bufferView"]
     pub buffer_view: String,
     #[serial_name = "byteOffset"]
-    pub byte_offset: uint,
+    pub byte_offset: gfx::attrib::Offset,
     #[serial_name = "byteStride"]
-    pub byte_stride: uint,
+    pub byte_stride: gfx::attrib::Stride,
     #[serial_name = "componentType"]
-    pub component_type: uint,
-    pub count: uint,
+    pub component_type: GLenum,
+    pub count: gfx::VertexCount,
     #[serial_name = "type"]
     pub ty: String,
     pub name: String,
@@ -47,7 +49,7 @@ pub struct Shader {
     pub name: String,
     pub uri: String,
     #[serial_name = "type"]
-    pub ty: uint,
+    pub ty: GLenum,
 }
 
 #[deriving_deserializable]
@@ -81,31 +83,31 @@ pub struct StateFunctions {
     #[serial_name = "blendColor"]
     pub blend_color: (f32, f32, f32, f32),
     #[serial_name = "blendEquationSeparate"]
-    pub blend_equation_separate: (uint, uint),
+    pub blend_equation_separate: (GLenum, GLenum),
     #[serial_name = "blendFuncSeparate"]
-    pub blend_func_separate: (uint, uint, uint, uint),
+    pub blend_func_separate: (GLenum, GLenum, GLenum, GLenum),
     #[serial_name = "colorMask"]
     pub color_mask: (bool, bool, bool, bool),
     #[serial_name = "cullFace"]
-    pub cull_face: (uint, ),
+    pub cull_face: (GLenum, ),
     #[serial_name = "depthFunc"]
-    pub depth_func: (uint, ),
+    pub depth_func: (GLenum, ),
     #[serial_name = "depthMask"]
     pub depth_mask: (bool, ),
     #[serial_name = "depthRange"]
     pub depth_range: (f32, f32),
     #[serial_name = "frontFace"]
-    pub front_face: (uint, ),
+    pub front_face: (GLenum, ),
     #[serial_name = "lineWidth"]
-    pub line_width: (f32, ),
+    pub line_width: (gfx::state::LineWidth, ),
     #[serial_name = "polygonOffset"]
-    pub polygon_offset: (f32, f32),
-    pub scissor: (f32, f32, f32, f32),
+    pub polygon_offset: (gfx::state::OffsetFactor, gfx::state::OffsetUnits),
+    pub scissor: (u16, u16, u16, u16),
 }
 
 #[deriving_deserializable]
 pub struct States {
-    pub enable: Vec<uint>,
+    pub enable: Vec<GLenum>,
     pub functions: StateFunctions,
 }
 

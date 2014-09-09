@@ -3,11 +3,14 @@
 #![crate_name = "gltf"]
 #![feature(phase)]
 
+#[phase(plugin, link)]
+extern crate log;
 extern crate serialize;
 extern crate cgmath;
 extern crate gfx;
 #[phase(plugin)]
 extern crate gfx_macros;
+extern crate gfx_gl;
 extern crate serde;
 #[phase(plugin)]
 extern crate serde_macros;
@@ -16,6 +19,7 @@ use std::cmp;
 use std::collections::HashMap;
 use std::io::File;
 use serde::{de, json};
+use gfx_gl::types::GLenum;
 
 mod types;
 
@@ -57,19 +61,18 @@ fn attrib_to_slice(attrib: &gfx::Attribute)
 }
 
 #[deriving(Clone, PartialEq, Show)]
-pub enum AccessorError {
+pub enum AccessorCountError {
     AccessorMatrix(u8),
     AccessorUnknown(String),
 }
 
-fn parse_accessor_type(ty: &str) -> Result<(gfx::attrib::Count,
-                       gfx::attrib::Type), AccessorError> {
+fn parse_accessor_count(ty: &str) -> Result<gfx::attrib::Count, AccessorCountError> {
     use gfx::attrib as a;
     match ty {
-        "SCALAR" => Ok((1, a::Float(a::FloatDefault, a::F32))),
-        "VEC2"   => Ok((2, a::Float(a::FloatDefault, a::F32))),
-        "VEC3"   => Ok((3, a::Float(a::FloatDefault, a::F32))),
-        "VEC4"   => Ok((4, a::Float(a::FloatDefault, a::F32))),
+        "SCALAR" => Ok(1),
+        "VEC2"   => Ok(2),
+        "VEC3"   => Ok(3),
+        "VEC4"   => Ok(4),
         "MAT2"   => Err(AccessorMatrix(2)),
         "MAT3"   => Err(AccessorMatrix(3)),
         "MAT4"   => Err(AccessorMatrix(4)),
@@ -78,14 +81,76 @@ fn parse_accessor_type(ty: &str) -> Result<(gfx::attrib::Count,
 }
 
 #[deriving(Clone, PartialEq, Show)]
-pub struct ShaderError(uint);
+pub enum AccessorTypeError {
+    AccessorType(GLenum),
+    AccessorRange(f32, f32),
+}
 
-fn parse_shader_type(ty: uint) -> Result<gfx::shade::Stage, ShaderError> {
+fn parse_accessor_type(ty: GLenum, range: f32) -> Result<gfx::attrib::Type, AccessorTypeError> {
+    use gfx::attrib as a;
+    let sub = if range <= 2.0 {a::IntNormalized} else {a::IntAsFloat};
+    Ok(match ty {
+        gfx_gl::BYTE => a::Int(sub, a::U8, a::Signed),
+        gfx_gl::UNSIGNED_BYTE => a::Int(sub, a::U8, a::Unsigned),
+        gfx_gl::SHORT => a::Int(sub, a::U16, a::Signed),
+        gfx_gl::UNSIGNED_SHORT => a::Int(sub, a::U32, a::Unsigned),
+        gfx_gl::INT => a::Int(sub, a::U16, a::Signed),
+        gfx_gl::UNSIGNED_INT => a::Int(sub, a::U32, a::Unsigned),
+        gfx_gl::FLOAT => a::Float(a::FloatDefault, a::F32),
+        _ => return Err(AccessorType(ty)),
+    })
+}
+
+#[deriving(Clone, PartialEq, Show)]
+pub struct ShaderError(GLenum);
+
+fn parse_shader_type(ty: GLenum) -> Result<gfx::shade::Stage, ShaderError> {
     match ty {
-        35633 => Ok(gfx::shade::Vertex),
-        35632 => Ok(gfx::shade::Fragment),
+        gfx_gl::VERTEX_SHADER => Ok(gfx::shade::Vertex),
+        gfx_gl::GEOMETRY_SHADER => Ok(gfx::shade::Geometry),
+        gfx_gl::FRAGMENT_SHADER => Ok(gfx::shade::Fragment),
         _ => Err(ShaderError(ty)),
     }
+}
+
+fn parse_state(s: types::States) -> gfx::DrawState {
+    let mut d = gfx::DrawState::new();
+    for gl in s.enable.iter() {
+        match *gl {
+            gfx_gl::CULL_FACE => {
+                let cull = match s.functions.cull_face {
+                    (gfx_gl::FRONT, ) => gfx::state::CullFront,
+                    (gfx_gl::BACK, ) => gfx::state::CullBack,
+                    _ => {
+                        error!("Unknown cull mode: {}", s.functions.cull_face);
+                        gfx::state::CullNothing
+                    },
+                };
+                d.primitive.method = gfx::state::Fill(cull);
+            },
+            gfx_gl::POLYGON_OFFSET_FILL => {
+                let (f, u) = s.functions.polygon_offset;
+                d.primitive.offset = gfx::state::Offset(f, u);
+            },
+            gfx_gl::SAMPLE_ALPHA_TO_COVERAGE => {
+                //d.multisample.alpha_to_coverage = ;
+            },
+            gfx_gl::DEPTH_TEST => {
+                //d.depth = Some();
+            },
+            gfx_gl::BLEND => {
+                //d.blend = Some();
+            },
+            gfx_gl::SCISSOR_TEST => {
+                let (x, y, w, h) = s.functions.scissor;
+                d.scissor = Some(gfx::Rect {
+                    x: x, y: y, w: w, h: h,
+                });
+            },
+            _ => error!("Unknown GL state: {}", *gl),
+        }
+    }
+    d
 }
 
 pub enum LoadError {
@@ -100,11 +165,11 @@ pub struct SubMesh {
 }
 
 pub struct Package {
-    pub buffers: HashMap<String, gfx::RawBufferHandle>,
-    pub attributes: HashMap<String, (gfx::Attribute, uint)>,
-    pub models: HashMap<String, Vec<SubMesh>>,
-    pub shaders: HashMap<String, gfx::ShaderHandle>,
-    pub programs: HashMap<String, gfx::ProgramHandle>,
+    pub buffers:    HashMap<String, gfx::RawBufferHandle>,
+    pub attributes: HashMap<String, (gfx::Attribute, gfx::VertexCount)>,
+    pub models:     HashMap<String, Vec<SubMesh>>,
+    pub shaders:    HashMap<String, gfx::ShaderHandle>,
+    pub programs:   HashMap<String, gfx::ProgramHandle>,
 }
 
 impl Package {
@@ -120,15 +185,17 @@ impl Package {
             device.create_buffer_static(&data).raw()
         });
         let attributes = load_map(&json, "accessors", |a: types::Accessor| {
-            let (el_count, el_ty) = parse_accessor_type(a.ty.as_slice()).unwrap();
+            let range = a.max.val0() - a.min.val0();
+            let el_count = parse_accessor_count(a.ty.as_slice()).unwrap();
+            let el_type  = parse_accessor_type(a.component_type, range).unwrap();
             (gfx::Attribute {
                 name: a.name,
                 buffer: *buffers.find(&a.buffer_view).unwrap(),
                 format: gfx::attrib::Format {
                     elem_count: el_count,
-                    elem_type: el_ty,
-                    offset: a.byte_offset as gfx::attrib::Offset,
-                    stride: a.byte_stride as gfx::attrib::Stride,
+                    elem_type: el_type,
+                    offset: a.byte_offset,
+                    stride: a.byte_stride,
                     instance_rate: 0,
                 },
             }, a.count)
@@ -139,7 +206,7 @@ impl Package {
                     num_vertices: prim.attributes.values().fold(0xFFFFFFFF, |min, id| {
                         let &(_, count) = attributes.find(id).unwrap();
                         cmp::min(min, count)
-                    }) as gfx::VertexCount,
+                    }),
                     attributes: prim.attributes.iter().map(|(name, id)| {
                         let (mut at, _) = attributes.find(id).unwrap().clone();
                         at.name = name.clone();
