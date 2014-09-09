@@ -113,8 +113,80 @@ fn parse_shader_type(ty: GLenum) -> Result<gfx::shade::Stage, ShaderError> {
     }
 }
 
+fn parse_comparison(fun: GLenum) -> Result<gfx::state::Comparison, ()> {
+    use gfx::state as s;
+    Ok(match fun {
+        gfx_gl::NEVER    => s::Never,
+        gfx_gl::LESS     => s::Less,
+        gfx_gl::LEQUAL   => s::LessEqual,
+        gfx_gl::EQUAL    => s::Equal,
+        gfx_gl::GEQUAL   => s::GreaterEqual,
+        gfx_gl::GREATER  => s::Greater,
+        gfx_gl::NOTEQUAL => s::NotEqual,
+        gfx_gl::ALWAYS   => s::Always,
+        _ => return Err(()),
+    })
+}
+
+fn parse_blend_factor(factor: GLenum) -> Result<gfx::state::Factor, ()> {
+    use gfx::state as s;
+    Ok(match factor {
+        gfx_gl::ZERO => s::Factor(s::Normal, s::Zero),
+        gfx_gl::SRC_COLOR => s::Factor(s::Normal, s::SourceColor),
+        gfx_gl::SRC_ALPHA => s::Factor(s::Normal, s::SourceAlpha),
+        gfx_gl::SRC_ALPHA_SATURATE => s::Factor(s::Normal, s::SourceAlphaSaturated),
+        gfx_gl::DST_COLOR => s::Factor(s::Normal, s::DestColor),
+        gfx_gl::DST_ALPHA => s::Factor(s::Normal, s::DestAlpha),
+        gfx_gl::CONSTANT_COLOR => s::Factor(s::Normal, s::ConstColor),
+        gfx_gl::CONSTANT_ALPHA => s::Factor(s::Normal, s::ConstAlpha),
+        gfx_gl::ONE => s::Factor(s::Inverse, s::Zero),
+        gfx_gl::ONE_MINUS_SRC_COLOR => s::Factor(s::Inverse, s::SourceColor),
+        gfx_gl::ONE_MINUS_SRC_ALPHA => s::Factor(s::Inverse, s::SourceAlpha),
+        gfx_gl::ONE_MINUS_DST_COLOR => s::Factor(s::Inverse, s::DestColor),
+        gfx_gl::ONE_MINUS_DST_ALPHA => s::Factor(s::Inverse, s::DestAlpha),
+        gfx_gl::ONE_MINUS_CONSTANT_COLOR => s::Factor(s::Inverse, s::ConstColor),
+        gfx_gl::ONE_MINUS_CONSTANT_ALPHA => s::Factor(s::Inverse, s::ConstAlpha),
+        _ => return Err(()),
+    })
+}
+
+#[deriving(Clone, PartialEq, Show)]
+pub enum BlendChannelError {
+    BlendEquation(GLenum),
+    BlendSource(GLenum),
+    BlendDestination(GLenum),
+}
+
+fn parse_blend_channel(eq: GLenum, src: GLenum, dst: GLenum)
+                       -> Result<gfx::state::BlendChannel, BlendChannelError> {
+    use gfx::state as s;
+    Ok(s::BlendChannel {
+        equation: match eq {
+            gfx_gl::FUNC_ADD => s::FuncAdd,
+            gfx_gl::FUNC_SUBTRACT => s::FuncSub,
+            gfx_gl::FUNC_REVERSE_SUBTRACT => s::FuncRevSub,
+            gfx_gl::MIN => s::FuncMin,
+            gfx_gl::MAX => s::FuncMax,
+            _ => return Err(BlendEquation(eq)),
+        },
+        source: match parse_blend_factor(src) {
+            Ok(f) => f,
+            Err(_) => return Err(BlendSource(src)),
+        },
+        destination: match parse_blend_factor(dst) {
+            Ok(f) => f,
+            Err(_) => return Err(BlendDestination(src)),
+        },
+    })
+}
+
 fn parse_state(s: types::States) -> gfx::DrawState {
     let mut d = gfx::DrawState::new();
+    d.primitive.front_face = match s.functions.front_face {
+        (gfx_gl::CW, ) => gfx::state::Clockwise,
+        (gfx_gl::CCW, ) => gfx::state::CounterClockwise,
+        _ => fail!("Unknown front face: {}", s.functions.front_face),
+    };
     for gl in s.enable.iter() {
         match *gl {
             gfx_gl::CULL_FACE => {
@@ -133,13 +205,28 @@ fn parse_state(s: types::States) -> gfx::DrawState {
                 d.primitive.offset = gfx::state::Offset(f, u);
             },
             gfx_gl::SAMPLE_ALPHA_TO_COVERAGE => {
+                //TODO
                 //d.multisample.alpha_to_coverage = ;
             },
+            gfx_gl::STENCIL_TEST => {
+                //TODO
+            },
             gfx_gl::DEPTH_TEST => {
-                //d.depth = Some();
+                let f = &s.functions;
+                d.depth = Some(gfx::state::Depth {
+                    fun: parse_comparison(f.depth_func.val0()).unwrap(),
+                    write: f.depth_mask.val0(),
+                });
             },
             gfx_gl::BLEND => {
-                //d.blend = Some();
+                let (eq_c, eq_a) = s.functions.blend_equation_separate;
+                let (src_c, dst_c, src_a, dst_a) = s.functions.blend_func_separate;
+                let (r, g, b, a) = s.functions.blend_color;
+                d.blend = Some(gfx::state::Blend {
+                    color: parse_blend_channel(eq_c, src_c, dst_c).unwrap(),
+                    alpha: parse_blend_channel(eq_a, src_a, dst_a).unwrap(),
+                    value: [r, g, b, a],
+                });
             },
             gfx_gl::SCISSOR_TEST => {
                 let (x, y, w, h) = s.functions.scissor;
