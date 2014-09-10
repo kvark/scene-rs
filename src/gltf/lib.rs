@@ -65,10 +65,16 @@ pub enum LoadError {
     ErrorJson,
 }
 
+pub struct Material {
+    name: String,
+    program: gfx::ProgramHandle,
+    parameters: gfx::shade::ParamDictionary,
+}
+
 pub struct SubMesh {
     pub mesh: gfx::Mesh,
     pub slice: gfx::Slice,
-    pub material: String,
+    pub material: String,   //Material
 }
 
 pub struct Package {

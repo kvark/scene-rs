@@ -1,4 +1,5 @@
 use std::collections::TreeMap;
+use serde::json::Json;
 use gfx;
 use gfx_gl::types::GLenum;
 
@@ -112,8 +113,25 @@ pub struct States {
 }
 
 #[deriving_deserializable]
+pub struct PassProfile {
+    #[serial_name = "lightingModel"]
+    pub lighting_model: String,
+    pub parameters: Vec<String>,
+    #[serial_name = "texcoordBindings"]
+    pub texcoord_bindings: TreeMap<String, String>,
+}
+
+#[deriving_deserializable]
+pub struct PassDetails {
+    #[serial_name = "commonProfile"]
+    pub common_profile: PassProfile,
+    #[serial_name = "type"]
+    pub ty: String,
+}
+
+#[deriving_deserializable]
 pub struct Pass {
-    pub details: (),
+    pub details: PassDetails,
     #[serial_name = "instanceProgram"]
     pub instance_program: InstanceProgram,
     pub states: States,
@@ -125,4 +143,17 @@ pub struct Technique {
     pub parameters: TreeMap<String, TechniqueParameter>,
     pub pass: String,
     pub passes: TreeMap<String, Pass>,
+}
+
+#[deriving_deserializable]
+pub struct InstanceTechnique {
+    pub technique: String,
+    pub values: TreeMap<String, Json>,  //raw
+}
+
+#[deriving_deserializable]
+pub struct Material {
+    pub name: String,
+    #[serial_name = "instanceTechnique"]
+    pub instance_technique: InstanceTechnique,
 }
