@@ -3,10 +3,18 @@ name = "asteroids"
 version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9ec516616)",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
- "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#c0c43f41387b30c2f78f19dbae1212256a99de49)",
- "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#90c56d4809c115170ba3110c847253bfdc11e7ec)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
+ "gl_init 0.0.1 (git+https://github.com/tomaka/gl-init-rs.git#661c936253bda31e5457cb74eca85d37582f0717)",
+ "glfw 0.0.1 (git+https://github.com/bjz/glfw-rs.git#d027960373d0316c6c47c8a4e13742ca580264a6)",
  "scene 0.1.0",
+]
+
+[[package]]
+name = "android_glue"
+version = "0.0.1"
+source = "git+https://github.com/tomaka/android-rs-glue#72fe183e9cfde2ef24505a7ca16855219ffbe159"
+dependencies = [
+ "compile_msg 0.1.0 (git+https://github.com/huonw/compile_msg#7ac74e00b8d0a50de4110c5d6b7f825fb36785ac)",
 ]
 
 [[package]]
@@ -17,12 +25,12 @@ source = "git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9e
 [[package]]
 name = "compile_msg"
 version = "0.1.0"
-source = "git+https://github.com/huonw/compile_msg#de280134208e6ac6b54be81c7ffa0341ff665009"
+source = "git+https://github.com/huonw/compile_msg#7ac74e00b8d0a50de4110c5d6b7f825fb36785ac"
 
 [[package]]
 name = "device"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
+source = "git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a"
 dependencies = [
  "gfx_gl 0.1.0 (git+https://github.com/gfx-rs/gfx_gl.git#52bb510e9e76cd3c0aed7b6aa678c03059d630a6)",
 ]
@@ -34,11 +42,11 @@ version = "0.1.0"
 [[package]]
 name = "gfx"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
+source = "git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
- "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
- "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
+ "gfx_macros 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
+ "render 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
 ]
 
 [[package]]
@@ -46,38 +54,40 @@ name = "gfx_gl"
 version = "0.1.0"
 source = "git+https://github.com/gfx-rs/gfx_gl.git#52bb510e9e76cd3c0aed7b6aa678c03059d630a6"
 dependencies = [
- "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#accdd51d493e62855bd9146bc221db464028510a)",
+ "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#e96c67449fe522b2b8e71182121f7db6d8b1dcce)",
 ]
 
 [[package]]
 name = "gfx_macros"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
+source = "git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a"
 
 [[package]]
 name = "gl_generator"
 version = "0.0.1"
-source = "git+https://github.com/bjz/gl-rs.git#accdd51d493e62855bd9146bc221db464028510a"
+source = "git+https://github.com/bjz/gl-rs.git#e96c67449fe522b2b8e71182121f7db6d8b1dcce"
 dependencies = [
- "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#accdd51d493e62855bd9146bc221db464028510a)",
+ "khronos_api 0.0.1 (git+https://github.com/bjz/gl-rs.git#e96c67449fe522b2b8e71182121f7db6d8b1dcce)",
  "rust-xml 0.1.0 (git+https://github.com/netvl/rust-xml#418a3776922e545a7c33b1f68d9c8c513dc5c80b)",
 ]
 
 [[package]]
 name = "gl_init"
 version = "0.0.1"
-source = "git+https://github.com/tomaka/gl-init-rs.git#c0c43f41387b30c2f78f19dbae1212256a99de49"
+source = "git+https://github.com/tomaka/gl-init-rs.git#661c936253bda31e5457cb74eca85d37582f0717"
 dependencies = [
- "compile_msg 0.1.0 (git+https://github.com/huonw/compile_msg#de280134208e6ac6b54be81c7ffa0341ff665009)",
+ "android_glue 0.0.1 (git+https://github.com/tomaka/android-rs-glue#72fe183e9cfde2ef24505a7ca16855219ffbe159)",
+ "compile_msg 0.1.0 (git+https://github.com/huonw/compile_msg#7ac74e00b8d0a50de4110c5d6b7f825fb36785ac)",
+ "gl_generator 0.0.1 (git+https://github.com/bjz/gl-rs.git#e96c67449fe522b2b8e71182121f7db6d8b1dcce)",
 ]
 
 [[package]]
 name = "glfw"
 version = "0.0.1"
-source = "git+https://github.com/bjz/glfw-rs.git#90c56d4809c115170ba3110c847253bfdc11e7ec"
+source = "git+https://github.com/bjz/glfw-rs.git#d027960373d0316c6c47c8a4e13742ca580264a6"
 dependencies = [
- "link_glfw 0.1.0 (git+https://github.com/bjz/glfw-rs.git#90c56d4809c115170ba3110c847253bfdc11e7ec)",
- "semver 0.0.1 (git+https://github.com/rust-lang/semver#df163f7b22686493b037eee1f1f9d1a2742f9bbe)",
+ "link_glfw 0.1.0 (git+https://github.com/bjz/glfw-rs.git#d027960373d0316c6c47c8a4e13742ca580264a6)",
+ "semver 0.0.1 (git+https://github.com/rust-lang/semver#d04583a173395b76c1eaa15cc630a5f6f8f0ae10)",
 ]
 
 [[package]]
@@ -85,19 +95,19 @@ name = "gltf"
 version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9ec516616)",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
- "serde 0.1.0 (git+https://github.com/erickt/rust-serde#906e9db9d5500bdb1fa3255da788b28ef73126cb)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
+ "serde 0.1.0 (git+https://github.com/erickt/rust-serde#19f04f094a95b29f808e42f65f8c3345506d4f0a)",
 ]
 
 [[package]]
 name = "khronos_api"
 version = "0.0.1"
-source = "git+https://github.com/bjz/gl-rs.git#accdd51d493e62855bd9146bc221db464028510a"
+source = "git+https://github.com/bjz/gl-rs.git#e96c67449fe522b2b8e71182121f7db6d8b1dcce"
 
 [[package]]
 name = "link_glfw"
 version = "0.1.0"
-source = "git+https://github.com/bjz/glfw-rs.git#90c56d4809c115170ba3110c847253bfdc11e7ec"
+source = "git+https://github.com/bjz/glfw-rs.git#d027960373d0316c6c47c8a4e13742ca580264a6"
 
 [[package]]
 name = "render"
@@ -105,15 +115,15 @@ version = "0.1.0"
 dependencies = [
  "cgmath 0.0.1 (git+https://github.com/bjz/cgmath-rs#9ade4ce92d639d2a67c0932816ff26f9ec516616)",
  "ecs 0.1.0",
- "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
+ "gfx 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
 ]
 
 [[package]]
 name = "render"
 version = "0.1.0"
-source = "git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4"
+source = "git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a"
 dependencies = [
- "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#86b34980ced7c650bb6d3277b5876d3a839273b4)",
+ "device 0.1.0 (git+https://github.com/gfx-rs/gfx-rs#a67b0576ff83ba6081ddcaa0027e01c1c296641a)",
 ]
 
 [[package]]
@@ -133,18 +143,18 @@ dependencies = [
 [[package]]
 name = "semver"
 version = "0.0.1"
-source = "git+https://github.com/rust-lang/semver#df163f7b22686493b037eee1f1f9d1a2742f9bbe"
+source = "git+https://github.com/rust-lang/semver#d04583a173395b76c1eaa15cc630a5f6f8f0ae10"
 
 [[package]]
 name = "serde"
 version = "0.1.0"
-source = "git+https://github.com/erickt/rust-serde#906e9db9d5500bdb1fa3255da788b28ef73126cb"
+source = "git+https://github.com/erickt/rust-serde#19f04f094a95b29f808e42f65f8c3345506d4f0a"
 dependencies = [
- "serde_macros 0.1.0 (git+https://github.com/erickt/rust-serde#906e9db9d5500bdb1fa3255da788b28ef73126cb)",
+ "serde_macros 0.1.0 (git+https://github.com/erickt/rust-serde#19f04f094a95b29f808e42f65f8c3345506d4f0a)",
 ]
 
 [[package]]
 name = "serde_macros"
 version = "0.1.0"
-source = "git+https://github.com/erickt/rust-serde#906e9db9d5500bdb1fa3255da788b28ef73126cb"
+source = "git+https://github.com/erickt/rust-serde#19f04f094a95b29f808e42f65f8c3345506d4f0a"
 

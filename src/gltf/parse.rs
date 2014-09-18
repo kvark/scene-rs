@@ -1,6 +1,7 @@
 use gfx;
 use gfx_gl as gl;
 use gfx_gl::types::GLenum;
+use serde::json;
 
 #[deriving(Clone, PartialEq, Show)]
 pub enum AccessorCountError {
@@ -122,12 +123,17 @@ pub fn parse_blend_channel(eq: GLenum, src: GLenum, dst: GLenum)
     })
 }
 
-pub fn parse_state(s: ::types::States) -> gfx::DrawState {
+#[deriving(Clone, PartialEq, Show)]
+pub enum StateError {
+    StateUnknownFrontFace(GLenum),
+}
+
+pub fn parse_state(s: &::types::States) -> Result<gfx::DrawState, StateError> {
     let mut d = gfx::DrawState::new();
     d.primitive.front_face = match s.functions.front_face {
         (gl::CW, ) => gfx::state::Clockwise,
         (gl::CCW, ) => gfx::state::CounterClockwise,
-        _ => fail!("Unknown front face: {}", s.functions.front_face),
+        (face, ) => return Err(StateUnknownFrontFace(face)),
     };
     for gl in s.enable.iter() {
         match *gl {
@@ -179,5 +185,28 @@ pub fn parse_state(s: ::types::States) -> gfx::DrawState {
             _ => error!("Unknown GL state: {}", *gl),
         }
     }
-    d
+    Ok(d)
+}
+
+pub enum Parameter {
+    ParamUniform(gfx::UniformValue),
+    ParamTexture(String),
+}
+
+impl Parameter {
+    pub fn from_json(p: &json::Json) -> Result<Parameter, ()> {
+        match *p {
+            json::Integer(v) => Ok(ParamUniform(gfx::ValueI32(v as i32))),
+            json::Floating(v) => Ok(ParamUniform(gfx::ValueF32(v as f32))),
+            json::List(ref list) => match list.as_slice() {
+                [json::Integer(v0), json::Integer(v1), json::Integer(v2), json::Integer(v3)] =>
+                    Ok(ParamUniform(gfx::ValueI32Vector4([v0 as i32, v1 as i32, v2 as i32, v3 as i32]))),
+                [json::Floating(v0), json::Floating(v1), json::Floating(v2), json::Floating(v3)] =>
+                    Ok(ParamUniform(gfx::ValueF32Vector4([v0 as f32, v1 as f32, v2 as f32, v3 as f32]))),
+                _ => Err(()),
+            },
+            json::String(ref s) => Ok(ParamTexture(s.clone())),
+            _ => Err(()),
+        }
+    }
 }

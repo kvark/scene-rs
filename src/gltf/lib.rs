@@ -65,24 +65,38 @@ pub enum LoadError {
     ErrorJson,
 }
 
+pub struct Pass {
+    pub name: String,
+    pub program: gfx::ProgramHandle,
+    pub param_link: gfx::shade::ParamDictionaryLink,
+    pub draw_state: gfx::DrawState,
+}
+
+pub struct Technique {
+    pub name: String,
+    pub passes: Vec<Pass>,
+    pub default_pass: uint,
+    pub parameters: gfx::shade::ParamDictionary,
+}
+
+pub struct Id<T>(String);
+
 pub struct Material {
-    name: String,
-    program: gfx::ProgramHandle,
-    parameters: gfx::shade::ParamDictionary,
+    pub name: String,
+    pub technique: Id<Technique>,
+    pub parameters: gfx::shade::ParamDictionary,
 }
 
 pub struct SubMesh {
     pub mesh: gfx::Mesh,
     pub slice: gfx::Slice,
-    pub material: String,   //Material
+    pub material: Id<Material>,
 }
 
 pub struct Package {
-    pub buffers:    HashMap<String, gfx::RawBufferHandle>,
-    pub attributes: HashMap<String, (gfx::Attribute, gfx::VertexCount)>,
-    pub models:     HashMap<String, Vec<SubMesh>>,
-    pub shaders:    HashMap<String, gfx::ShaderHandle>,
-    pub programs:   HashMap<String, gfx::ProgramHandle>,
+    pub techniques: HashMap<String, Technique>,
+    pub materials: HashMap<String, Material>,
+    pub models: HashMap<String, Vec<SubMesh>>,
 }
 
 impl Package {
@@ -95,7 +109,7 @@ impl Package {
         let buffers = load_map(&json, "buffers", |b: types::Buffer| {
             let data = File::open(&Path::new(b.uri)).read_to_end().unwrap();
             debug_assert_eq!(data.len(), b.byte_length);
-            device.create_buffer_static(&data).raw()
+            device.create_buffer_static(data.as_slice()).raw()
         });
         let attributes = load_map(&json, "accessors", |a: types::Accessor| {
             let range = a.max.val0() - a.min.val0();
@@ -113,24 +127,6 @@ impl Package {
                 },
             }, a.count)
         });
-        let models = load_map(&json, "meshes", |m: types::Mesh| {
-            m.primitives.iter().map(|prim| SubMesh {
-                mesh: gfx::Mesh {
-                    num_vertices: prim.attributes.values().fold(0xFFFFFFFF, |min, id| {
-                        let &(_, count) = attributes.find(id).unwrap();
-                        cmp::min(min, count)
-                    }),
-                    attributes: prim.attributes.iter().map(|(name, id)| {
-                        let (mut at, _) = attributes.find(id).unwrap().clone();
-                        at.name = name.clone();
-                        at
-                    }).collect(),
-                },
-                slice: attrib_to_slice(attributes.find(&prim.indices)
-                    .unwrap().ref0()).unwrap(),
-                material: prim.material.clone(),
-            }).collect()
-        });
         let shaders = load_map(&json, "shaders", |s: types::Shader| {
             let stage = parse::parse_shader_type(s.ty).unwrap();
             let data = File::open(&Path::new(s.uri)).read_to_end().unwrap();
@@ -147,12 +143,55 @@ impl Package {
             assert_eq!(*fs.get_info(), gfx::shade::Fragment);
             device.create_program([vs, fs].as_slice()).unwrap()
         });
+        let techniques = load_map(&json, "techniques", |t: types::Technique| {
+            let passes: Vec<Pass> = t.passes.iter().map(|(s, p)| {
+                Pass {
+                    name: s.clone(),
+                    program: programs.find(&p.instance_program.program)
+                                     .unwrap().clone(),
+                    param_link: unimplemented!(),
+                    draw_state: parse::parse_state(&p.states).unwrap(),
+                }
+            }).collect();
+            let default = passes.iter().position(|p|
+                p.name.as_slice() == t.pass.as_slice()
+            ).unwrap();
+            Technique {
+                name: t.name.clone(),
+                passes: passes,
+                default_pass: default,
+                parameters: unimplemented!(),
+            }
+        });
+        let materials = load_map(&json, "materials", |m: types::Material| {
+            Material {
+                name: m.name.clone(),
+                technique: Id(m.instance_technique.technique.clone()),
+                parameters: unimplemented!(),
+            }
+        });
+        let models = load_map(&json, "meshes", |m: types::Mesh| {
+            m.primitives.iter().map(|prim| SubMesh {
+                mesh: gfx::Mesh {
+                    num_vertices: prim.attributes.values().fold(0xFFFFFFFF, |min, id| {
+                        let &(_, count) = attributes.find(id).unwrap();
+                        cmp::min(min, count)
+                    }),
+                    attributes: prim.attributes.iter().map(|(name, id)| {
+                        let (mut at, _) = attributes.find(id).unwrap().clone();
+                        at.name = name.clone();
+                        at
+                    }).collect(),
+                },
+                slice: attrib_to_slice(attributes.find(&prim.indices)
+                    .unwrap().ref0()).unwrap(),
+                material: Id(prim.material.clone()),
+            }).collect()
+        });
         Ok(Package {
-            buffers: buffers,
-            attributes: attributes,
+            techniques: techniques,
+            materials: materials,
             models: models,
-            shaders: shaders,
-            programs: programs,
         })
     }
 }
