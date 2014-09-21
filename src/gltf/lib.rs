@@ -68,7 +68,6 @@ pub enum LoadError {
 pub struct Pass {
     pub name: String,
     pub program: gfx::ProgramHandle,
-    pub param_link: gfx::shade::ParamDictionaryLink,
     pub draw_state: gfx::DrawState,
 }
 
@@ -80,6 +79,13 @@ pub struct Technique {
 }
 
 pub struct Id<T>(String);
+
+impl<T> Id<T> {
+    pub fn as_ref(&self) -> &String {
+        let Id(ref s) = *self;
+        s
+    }
+}
 
 pub struct Material {
     pub name: String,
@@ -98,6 +104,8 @@ pub struct Package {
     pub materials: HashMap<String, Material>,
     pub models: HashMap<String, Vec<SubMesh>>,
 }
+
+pub type Batch = gfx::batch::RefBatch<gfx::shade::ParamDictionaryLink, gfx::shade::ParamDictionary>;
 
 impl Package {
     pub fn load<C: gfx::CommandBuffer, D: gfx::Device<C>>(input: &str, device: &mut D)
@@ -149,7 +157,6 @@ impl Package {
                     name: s.clone(),
                     program: programs.find(&p.instance_program.program)
                                      .unwrap().clone(),
-                    param_link: unimplemented!(),
                     draw_state: parse::parse_state(&p.states).unwrap(),
                 }
             }).collect();
@@ -164,6 +171,7 @@ impl Package {
             }
         });
         let materials = load_map(&json, "materials", |m: types::Material| {
+            let tech = techniques.find(&m.instance_technique.technique).unwrap();
             Material {
                 name: m.name.clone(),
                 technique: Id(m.instance_technique.technique.clone()),
@@ -193,5 +201,23 @@ impl Package {
             materials: materials,
             models: models,
         })
+    }
+
+    pub fn to_batches(&self, context: &mut gfx::batch::Context) ->
+        (Vec<Batch>, Vec<gfx::batch::BatchError>) {
+        let mut batches = Vec::new();
+        let mut errors = Vec::new();
+        for model_vec in self.models.values() {
+            for model in model_vec.iter() {
+                let material = self.materials.find(model.material.as_ref()).unwrap();
+                let technique = self.techniques.find(material.technique.as_ref()).unwrap();
+                let pass = &technique.passes[technique.default_pass];
+                match context.batch(&model.mesh, model.slice, &pass.program, &pass.draw_state) {
+                    Ok(b) => batches.push(b),
+                    Err(e) => errors.push(e),
+                }
+            }
+        }
+        (batches, errors)
     }
 }
