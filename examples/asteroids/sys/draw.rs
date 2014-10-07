@@ -40,7 +40,7 @@ impl w::System for System {
                     }
                     None => ()
                 }
-                renderer.draw((drawable, &param, &self.context), &self.frame);
+                renderer.draw(&(drawable, &param, &self.context), &self.frame);
             });
         }
     }

@@ -140,6 +140,8 @@ impl Package {
             let data = File::open(&Path::new(s.uri)).read_to_end().unwrap();
             let source = gfx::ShaderSource {
                 glsl_120: None,
+                glsl_130: None,
+                glsl_140: None,
                 glsl_150: Some(gfx::OwnedBytes(data)),
             };
             device.create_shader(stage, source).unwrap()

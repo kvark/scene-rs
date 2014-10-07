@@ -17,6 +17,7 @@ git = "https://github.com/bjz/cgmath-rs"
 git = "https://github.com/gfx-rs/gfx-rs"
 
 [dependencies.serde]
+branch = "rust"
 git = "https://github.com/kvark/rust-serde"
 
 [dev_dependencies.gfx_gl]

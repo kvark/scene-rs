@@ -3,7 +3,7 @@
 
 extern crate cgmath;
 extern crate gfx;
-extern crate gl_init;
+extern crate glutin;
 extern crate glfw;
 #[phase(plugin, link)]
 extern crate ecs;
@@ -104,7 +104,7 @@ fn main() {
             window.swap_buffers();
         }
     }else {
-        let window = gl_init::WindowBuilder::new()
+        let window = glutin::WindowBuilder::new()
             .with_title(title.to_string())
             .with_gl_version((3,2))
             .build().unwrap();
@@ -127,9 +127,9 @@ fn main() {
             // quit when Esc is pressed.
             for event in window.poll_events() {
                 match event {
-                    gl_init::KeyboardInput(_, _, Some(gl_init::Escape), _) => break 'main,
-                    gl_init::Closed => break 'main,
-                    _ => ev_send.process_gl_init(event),
+                    glutin::KeyboardInput(_, _, Some(glutin::Escape), _) => break 'main,
+                    glutin::Closed => break 'main,
+                    _ => ev_send.process_glutin(event),
                 }
             }
             device.submit(renderer.as_buffer());

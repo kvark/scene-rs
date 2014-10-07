@@ -1,4 +1,4 @@
-use gl_init;
+use glutin;
 use glfw;
 use sys;
 
@@ -22,26 +22,26 @@ impl SenderHub {
         }, (rc, rb))
     }
 
-    pub fn process_gl_init(&self, event: gl_init::Event) {
+    pub fn process_glutin(&self, event: glutin::Event) {
         use sys::control::{EvThrust, EvTurn};
         use sys::bullet::{EvShoot};
         match event {
-            gl_init::KeyboardInput(state, _, Some(gl_init::A), _) =>
+            glutin::KeyboardInput(state, _, Some(glutin::A), _) =>
                 self.control.send(EvThrust(match state {
-                    gl_init::Pressed => 1.0,
-                    gl_init::Released => 0.0,
+                    glutin::Pressed => 1.0,
+                    glutin::Released => 0.0,
                 })),
-            gl_init::KeyboardInput(gl_init::Pressed, _, Some(gl_init::Left), _) =>
+            glutin::KeyboardInput(glutin::Pressed, _, Some(glutin::Left), _) =>
                 self.control.send(EvTurn(-1.0)),
-            gl_init::KeyboardInput(gl_init::Pressed, _, Some(gl_init::Right), _) =>
+            glutin::KeyboardInput(glutin::Pressed, _, Some(glutin::Right), _) =>
                 self.control.send(EvTurn(1.0)),
-            gl_init::KeyboardInput(gl_init::Released, _, Some(k), _)
-                if k == gl_init::Left || k == gl_init::Right =>
+            glutin::KeyboardInput(glutin::Released, _, Some(k), _)
+                if k == glutin::Left || k == glutin::Right =>
                 self.control.send(EvTurn(0.0)),
-            gl_init::KeyboardInput(state, _, Some(gl_init::S), _) =>
+            glutin::KeyboardInput(state, _, Some(glutin::S), _) =>
                 self.bullet.send(EvShoot(match state {
-                    gl_init::Pressed => true,
-                    gl_init::Released => false,
+                    glutin::Pressed => true,
+                    glutin::Released => false,
                 })),
             _ => (),
         }

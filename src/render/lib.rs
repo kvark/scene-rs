@@ -19,7 +19,7 @@ pub type Space = cgmath::Decomposed<
     cgmath::Quaternion<Scalar>
 >;
 
-struct Camera {
+pub struct Camera {
     space: Space,
     frustum: cgmath::Frustum<Scalar>,
 }
@@ -41,7 +41,7 @@ pub struct Queue<L, T> {
     indices: Vec<Index>,
 }
 
-struct ObjectIter<'a, L: 'a, T: 'a> {
+pub struct ObjectIter<'a, L: 'a, T: 'a> {
     objects: &'a [Object<L, T>],
     id_iter: slice::Items<'a, Index>,
 }
@@ -118,7 +118,7 @@ impl<L, T: gfx::shade::ShaderParam<L>> View<L, T> {
                   context: &'a gfx::batch::Context) {
         self.queue.sort(order_opaque);
         for ob in self.queue.objects() {
-            renderer.draw((&ob.batch, &ob.parameters, context), &self.frame);
+            renderer.draw(&(&ob.batch, &ob.parameters, context), &self.frame);
         }
     }
 }

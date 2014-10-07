@@ -64,7 +64,7 @@ impl Game {
     fn create_ship<C: gfx::CommandBuffer, D: gfx::Device<C>>(device: &mut D,
                    data: &mut world::Components, draw: &mut sys::draw::System,
                    program: gfx::ProgramHandle) -> world::Entity {
-        let mesh = device.create_mesh(vec![
+        let mesh = device.create_mesh([
             Vertex::new(-0.3, -0.5, 0x20C02000),
             Vertex::new(0.3, -0.5,  0x20C02000),
             Vertex::new(0.0, 0.5,   0xC0404000),
@@ -103,7 +103,7 @@ impl Game {
         let program = Game::create_program(device);
         let mut draw_system = sys::draw::System::new(SCREEN_EXTENTS, frame);
         let bullet_draw_id = {
-            let mesh = device.create_mesh(vec![
+            let mesh = device.create_mesh([
                 Vertex::new(0.0, 0.0, 0xFF808000),
             ]);
             let slice = mesh.to_slice(gfx::Point);
@@ -113,7 +113,7 @@ impl Game {
             w.data.draw.add(batch)
         };
         let aster_draw_id = {
-            let mesh = device.create_mesh(vec![
+            let mesh = device.create_mesh([
                 Vertex::new(-0.5, -0.5, 0xFFFFFF00),
                 Vertex::new(0.5, -0.5,  0xFFFFFF00),
                 Vertex::new(-0.5, 0.5,  0xFFFFFF00),
