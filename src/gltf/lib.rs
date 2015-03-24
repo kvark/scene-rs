@@ -1,19 +1,14 @@
 //! GLTF package loader for gfx-rs
 
-#![crate_name = "gltf"]
-#![feature(phase)]
+#![feature(plugin)]
+#![plugin(log, gfx_macros, serde_macros)]
 
-#[phase(plugin, link)]
 extern crate log;
 extern crate serialize;
 extern crate cgmath;
 extern crate gfx;
-#[phase(plugin)]
-extern crate gfx_macros;
 extern crate gfx_gl;
 extern crate serde;
-#[phase(plugin)]
-extern crate serde_macros;
 
 use std::cmp;
 use std::collections::HashMap;

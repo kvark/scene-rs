@@ -10,11 +10,5 @@ authors = [
 name = "scene"
 path = "src/lib.rs"
 
-[dependencies.ecs]
-path = "src/ecs/"
-
 [dependencies.gltf]
 path = "src/gltf/"
-
-[dependencies.render]
-path = "src/render/"
